@@ -55,12 +55,17 @@
     .legend-dot { width:10px; height:10px; border-radius:50%; }
     .calendar { position:relative; flex:1; min-height:0; display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); grid-template-rows: min-content repeat(var(--rows, 5), 1fr); gap:8px; overflow:hidden; }
     .calendar.expanded { overflow-x:hidden; overflow-y:auto; grid-template-rows: min-content repeat(var(--rows, 5), minmax(var(--row-min-height, 130px), auto)); }
-    .event-bar { position:absolute; height:26px; border-radius:6px; color: var(--text); font-size:0.78rem; font-weight:600; padding:0 10px; display:flex; align-items:center; white-space:nowrap; overflow:hidden; cursor:pointer; box-shadow:none; z-index:5; transition:filter .15s ease, transform .15s ease; }
+    .event-bar { position:absolute; height:26px; border-radius:6px; color:#fff; font-size:0.78rem; font-weight:600; padding:0 10px; display:flex; align-items:center; white-space:nowrap; overflow:hidden; cursor:pointer; box-shadow:none; z-index:5; transition:filter .15s ease, transform .15s ease; }
     .event-bar:hover { filter:brightness(0.96); }
     .event-bar-colorlayer { position:absolute; inset:0; display:flex; z-index:0; }
     .event-bar-color-seg { flex:1; }
     .event-bar-label { position:relative; z-index:1; min-width:0; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .event-bar-label .meta { font-weight:400; color: var(--muted); }
+    .event-bar-label .meta { font-weight:400; color: rgba(255,255,255,0.85); }
+    .event-row { display:flex; align-items:center; gap:5px; font-size:0.74rem; color:var(--text); cursor:pointer; padding:1px 2px; border-radius:4px; }
+    .event-row:hover { background:#f1f3f9; }
+    .event-row-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+    .event-row-text { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .event-row-text .time { font-variant-numeric:tabular-nums; color:var(--muted); }
     .day-name { text-align:center; padding:4px 4px 10px; background:transparent; border:none; border-bottom:1px solid var(--line); border-radius:0; font-weight:600; font-size:0.76rem; letter-spacing:0.06em; text-transform:uppercase; color:#8b93a7; }
     .day-name.weekend { color: #e2495c; }
     .day-cell { min-height:0; overflow:hidden; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:7px 7px 9px; display:flex; flex-direction:column; gap:6px; position:relative; }
@@ -71,7 +76,7 @@
     .day-number { width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:0.82rem; color:#4b5468; border-radius:50%; }
     .day-number.weekend { color: #e2495c; }
     .day-cell.today .day-number { background: var(--primary); color:#fff; }
-    .day-events { display:flex; flex-direction:column; gap:6px; flex:1; }
+    .day-events { display:flex; flex-direction:column; gap:1px; flex:1; min-height:0; overflow:hidden; }
     .modal { position:fixed; inset:0; background:rgba(15,23,42,0.45); display:none; align-items:center; justify-content:center; padding:20px; z-index:1000; overflow:auto; }
     .modal.active { display:flex; }
     .modal-card { width:min(520px,100%); background:white; border-radius:18px; padding:24px; box-shadow:0 20px 55px rgba(15,23,42,0.24); }
@@ -81,12 +86,13 @@
     .user-btn.junghyun.active { background: rgba(96,165,250,0.12); border-color: var(--junghyun); color: var(--junghyun); }
     .user-btn.ahyeon.active { background: rgba(52,211,153,0.12); border-color: var(--ahyeon); color: var(--ahyeon); }
     .user-btn.haseung.active { background: rgba(167,139,250,0.12); border-color: var(--haseung); color: var(--haseung); }
-    .type-picker { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin-top:6px; }
+    .type-picker { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:6px; }
     .type-btn { padding:10px 8px; border:1px solid var(--line); border-radius:12px; background:#f8fafc; color:#334155; font-weight:700; cursor:pointer; }
     .type-btn.active { color: white; }
     .type-btn.business.active { background: #ef4444; border-color: #ef4444; }
     .type-btn.vacation.active { background: #f59e0b; border-color: #f59e0b; }
     .type-btn.external.active { background: #0ea5e9; border-color: #0ea5e9; }
+    .type-btn.birthday.active { background: #ec4899; border-color: #ec4899; }
     .form-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
     .form-row.time-row { grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,auto); align-items:flex-start; }
     .spacer-label { visibility:hidden; display:block; }
@@ -118,6 +124,7 @@
       .day-cell { padding: 5px; gap: 4px; }
       .day-number { width: 21px; height: 21px; font-size: 0.78rem; }
       .event-bar { font-size: 0.72rem; height: 23px; padding: 0 7px 0 6px; }
+      .event-row { font-size: 0.7rem; gap: 4px; }
       .modal-card { width: min(92vw, 480px); padding: 16px; }
       #addEventBtn { display: none; }
     }
@@ -129,6 +136,7 @@
       .day-name { font-size: 0.64rem; }
       .day-number { width: 19px; height: 19px; font-size: 0.72rem; }
       .event-bar { font-size: 0.66rem; height: 21px; }
+      .event-row { font-size: 0.66rem; }
     }
   </style>
 </head>
@@ -165,7 +173,7 @@
       <h3>사용 방법</h3>
       <ul class="help-list">
         <li>날짜 칸을 클릭하거나 드래그해서 여러 날짜를 선택하면 일정 추가 창이 열립니다.</li>
-        <li>일정 종류(출장/휴일/외부활동), 참여자, 날짜, 시간, 메모를 입력하고 저장하세요.</li>
+        <li>일정 종류(출장/휴일/외부활동/생일), 참여자, 날짜, 시간, 메모를 입력하고 저장하세요.</li>
         <li>"종일"을 체크하면 시간 없이 하루 종일 일정으로 등록됩니다.</li>
         <li>만들어진 일정 막대를 클릭하면 수정, 드래그하면 날짜 이동, Ctrl을 누른 채 드래그하면 복제됩니다.</li>
         <li>달력 위에서 마우스 휠을 굴리면 이전/다음 달로 이동합니다.</li>
@@ -195,6 +203,7 @@
           <button type="button" class="type-btn business active" data-type="business">출장</button>
           <button type="button" class="type-btn vacation" data-type="vacation">휴일</button>
           <button type="button" class="type-btn external" data-type="external">외부활동</button>
+          <button type="button" class="type-btn birthday" data-type="birthday">생일</button>
         </div>
       </div>
 
@@ -261,7 +270,8 @@
     const typeMeta = {
       business: { label: '출장', color: '#ef4444' },
       vacation: { label: '휴일', color: '#f59e0b' },
-      external: { label: '외부활동', color: '#0ea5e9' }
+      external: { label: '외부활동', color: '#0ea5e9' },
+      birthday: { label: '생일', color: '#ec4899' }
     };
 
     const API_BASE_URL = 'https://monthly-uur4.onrender.com/family'; // 외부 API 호스트를 입력하세요. 로컬 서버 사용 시 ''로 비워두세요.
@@ -389,16 +399,6 @@
       return `${event.startTime} - ${event.endTime}`;
     }
 
-    function hexToRgba(hex, alpha) {
-      const clean = (hex || '#94a3b8').replace('#', '');
-      const full = clean.length === 3 ? clean.split('').map(c => c + c).join('') : clean;
-      const num = parseInt(full, 16);
-      const r = (num >> 16) & 255;
-      const g = (num >> 8) & 255;
-      const b = num & 255;
-      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-    }
-
     function escapeHtml(str) {
       return String(str).replace(/[&<>"']/g, ch => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -469,10 +469,14 @@
       }
     }
 
+    function isBannerEvent(ev) {
+      return ev.startDate !== ev.endDate || ev.allDay;
+    }
+
     function computeRowSlotCounts(dateKeys) {
       const rows = Math.ceil(dateKeys.length / 7);
       const rowSlots = Array.from({ length: rows }, () => []);
-      events.forEach(ev => {
+      events.filter(isBannerEvent).forEach(ev => {
         const eventStart = ev.startDate;
         const eventEnd = ev.endDate;
         const visibleStart = dateKeys[0];
@@ -519,6 +523,7 @@
       calendar.style.setProperty('--rows', totalCells / 7);
       calendar.style.setProperty('--row-min-height', `${32 + maxSlots * 30 + 14}px`);
       const cellMap = {};
+      const eventBoxMap = {};
 
       ['일','월','화','수','목','금','토'].forEach((name, idx) => {
         const dayName = document.createElement('div');
@@ -547,12 +552,15 @@
 
         const eventBox = document.createElement('div');
         eventBox.className = 'day-events';
+        const rowIndex = Math.floor(i / 7);
+        eventBox.style.paddingTop = slotCounts[rowIndex] ? `${slotCounts[rowIndex] * 30 + 4}px` : '2px';
         cell.appendChild(eventBox);
 
         cellMap[dateKey] = cell;
+        eventBoxMap[dateKey] = eventBox;
 
         cell.addEventListener('mousedown', (e) => {
-          if (e.target.closest('button') || e.target.closest('.event-chip')) return;
+          if (e.target.closest('button') || e.target.closest('.event-bar') || e.target.closest('.event-row')) return;
           e.preventDefault();
           dragSelection = { active: true, startDate: dateKey, endDate: dateKey };
           cell.classList.add('drag-active');
@@ -567,7 +575,7 @@
         });
 
         cell.addEventListener('touchstart', (e) => {
-          if (e.target.closest('button') || e.target.closest('.event-bar')) return;
+          if (e.target.closest('button') || e.target.closest('.event-bar') || e.target.closest('.event-row')) return;
           dragSelection = { active: true, startDate: dateKey, endDate: dateKey };
           cell.classList.add('drag-active');
           renderCalendar();
@@ -578,6 +586,7 @@
 
       document.getElementById('monthLabel').textContent = formatMonthLabel(currentDate);
       renderEventBars(dateKeys, cellMap);
+      renderTimedEvents(dateKeys, eventBoxMap);
     }
 
     function sortEventsForDisplay(list) {
@@ -595,7 +604,7 @@
       // segments that actually overlap in date get stacked below one another.
       const rowSlots = Array.from({ length: rows }, () => []);
 
-      sortEventsForDisplay(events).forEach(ev => {
+      sortEventsForDisplay(events).filter(isBannerEvent).forEach(ev => {
         const eventStart = ev.startDate;
         const eventEnd = ev.endDate;
         const visibleStart = dateKeys[0];
@@ -642,7 +651,7 @@
           segColors.forEach(c => {
             const seg = document.createElement('span');
             seg.className = 'event-bar-color-seg';
-            seg.style.background = hexToRgba(c, 0.18);
+            seg.style.background = c;
             colorLayer.appendChild(seg);
           });
           bar.appendChild(colorLayer);
@@ -686,6 +695,41 @@
 
           calendar.appendChild(bar);
         }
+      });
+    }
+
+    function renderTimedEvents(dateKeys, eventBoxMap) {
+      const visibleStart = dateKeys[0];
+      const visibleEnd = dateKeys[dateKeys.length - 1];
+
+      sortEventsForDisplay(events).filter(ev => !isBannerEvent(ev)).forEach(ev => {
+        if (ev.startDate < visibleStart || ev.startDate > visibleEnd) return;
+        const eventBox = eventBoxMap[ev.startDate];
+        if (!eventBox) return;
+
+        const userColors = ev.users.map(u => userMeta[u]?.color).filter(Boolean);
+        const dotColor = userColors[0] || typeMeta[ev.type]?.color || typeMeta.business.color;
+
+        const row = document.createElement('div');
+        row.className = 'event-row';
+
+        const dot = document.createElement('span');
+        dot.className = 'event-row-dot';
+        dot.style.background = dotColor;
+        row.appendChild(dot);
+
+        const text = document.createElement('span');
+        text.className = 'event-row-text';
+        const title = ev.memo || getTypeLabel(ev.type);
+        text.innerHTML = `<span class="time">${escapeHtml(ev.startTime)}</span> ${escapeHtml(title)}`;
+        row.appendChild(text);
+
+        row.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openModal(ev.startDate, ev);
+        });
+
+        eventBox.appendChild(row);
       });
     }
 
