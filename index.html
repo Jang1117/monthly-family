@@ -281,6 +281,11 @@
 
     const API_BASE_URL = 'https://monthly-uur4.onrender.com/family'; // 외부 API 호스트를 입력하세요. 로컬 서버 사용 시 ''로 비워두세요.
 
+    const BANNER_TOP = 32; // distance from cell top to the first banner slot
+    const BANNER_STEP = 30; // vertical spacing per banner slot
+    const BANNER_HEIGHT = 26; // must match .event-bar height in CSS
+    const BANNER_GAP = 3; // breathing room below the last banner before timed rows start
+
     let currentDate = new Date();
     let events = normalizeEvents(JSON.parse(localStorage.getItem('familyScheduleEvents') || '[]'));
     let selectedUsers = [];
@@ -541,7 +546,7 @@
       const calendar = document.getElementById('calendar');
       calendar.innerHTML = '';
       calendar.style.setProperty('--rows', totalCells / 7);
-      calendar.style.setProperty('--row-min-height', `${32 + maxSlots * 30 + 14}px`);
+      calendar.style.setProperty('--row-min-height', `${BANNER_TOP + maxSlots * BANNER_STEP + 14}px`);
       const cellMap = {};
       const eventBoxMap = {};
 
@@ -573,7 +578,6 @@
 
         const eventBox = document.createElement('div');
         eventBox.className = 'day-events';
-        eventBox.style.paddingTop = dateReserve[dateKey] ? `${dateReserve[dateKey] * 30 - 6}px` : '0px';
         cell.appendChild(eventBox);
 
         cellMap[dateKey] = cell;
@@ -604,6 +608,15 @@
         calendar.appendChild(cell);
       }
 
+      Object.keys(dateReserve).forEach(dateKey => {
+        const eventBox = eventBoxMap[dateKey];
+        if (!eventBox) return;
+        const requiredTop = BANNER_TOP + (dateReserve[dateKey] - 1) * BANNER_STEP + BANNER_HEIGHT + BANNER_GAP;
+        const naturalTop = eventBox.offsetTop;
+        const extra = Math.max(0, requiredTop - naturalTop);
+        eventBox.style.paddingTop = `${extra}px`;
+      });
+
       document.getElementById('monthLabel').textContent = formatMonthLabel(currentDate);
       renderEventBars(assignments, cellMap);
       renderTimedEvents(dateKeys, eventBoxMap);
@@ -627,7 +640,7 @@
 
         const startLeft = startCell.offsetLeft;
         const endLeft = endCell.offsetLeft + endCell.offsetWidth;
-        const top = startCell.offsetTop + 32 + slotIndex * 30;
+        const top = startCell.offsetTop + BANNER_TOP + slotIndex * BANNER_STEP;
         const left = startLeft + 2;
         const width = endLeft - startLeft - 4;
 
