@@ -481,7 +481,7 @@
       const visibleStart = dateKeys[0];
       const visibleEnd = dateKeys[dateKeys.length - 1];
 
-      events.filter(isBannerEvent).sort((a, b) => Number(a.id) - Number(b.id)).forEach(ev => {
+      events.filter(isBannerEvent).sort((a, b) => a.startDate.localeCompare(b.startDate) || Number(a.id) - Number(b.id)).forEach(ev => {
         const eventStart = ev.startDate;
         const eventEnd = ev.endDate;
         if (eventEnd < visibleStart || eventStart > visibleEnd) return;
