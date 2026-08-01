@@ -605,7 +605,7 @@
       // segments that actually overlap in date get stacked below one another.
       const rowSlots = Array.from({ length: rows }, () => []);
 
-      sortEventsForDisplay(events).filter(isBannerEvent).forEach(ev => {
+      events.filter(isBannerEvent).sort((a, b) => Number(a.id) - Number(b.id)).forEach(ev => {
         const eventStart = ev.startDate;
         const eventEnd = ev.endDate;
         const visibleStart = dateKeys[0];
