@@ -61,7 +61,7 @@
     .event-bar-color-seg { flex:1; }
     .event-bar-label { position:relative; z-index:1; min-width:0; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .event-bar-label .meta { font-weight:400; color: rgba(255,255,255,0.85); }
-    .event-row { position:relative; display:flex; align-items:center; height:22px; font-size:0.78rem; color:#fff; font-weight:600; cursor:pointer; padding:0 8px; border-radius:5px; overflow:hidden; }
+    .event-row { position:absolute; display:flex; align-items:center; height:22px; font-size:0.78rem; color:#fff; font-weight:600; cursor:pointer; padding:0 8px; border-radius:5px; overflow:hidden; z-index:5; transition:filter .15s ease; }
     .event-row:hover { filter:brightness(0.96); }
     .event-row-colorlayer { position:absolute; inset:0; display:flex; z-index:0; }
     .event-row-color-seg { flex:1; }
@@ -77,7 +77,6 @@
     .day-number { position:relative; z-index:6; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:0.82rem; color:#4b5468; border-radius:50%; flex-shrink:0; }
     .day-number.weekend { color: #e2495c; }
     .day-cell.today .day-number { background: var(--primary); color:#fff; }
-    .day-events { display:flex; flex-direction:column; gap:3px; flex:1; min-height:0; overflow:hidden; }
     .modal { position:fixed; inset:0; background:rgba(15,23,42,0.45); display:none; align-items:center; justify-content:center; padding:20px; z-index:1000; overflow:auto; }
     .modal.active { display:flex; }
     .modal-card { width:min(520px,100%); background:white; border-radius:18px; padding:24px; box-shadow:0 20px 55px rgba(15,23,42,0.24); }
@@ -281,9 +280,8 @@
 
     const API_BASE_URL = 'https://monthly-uur4.onrender.com/family'; // 외부 API 호스트를 입력하세요. 로컬 서버 사용 시 ''로 비워두세요.
 
-    const BANNER_TOP = 32; // distance from cell top to the first banner slot
-    const BANNER_STEP = 25; // vertical spacing per banner slot
-    const BANNER_GAP = 3; // breathing room below the last banner before timed rows start
+    const BANNER_TOP = 32; // distance from cell top to the first slot
+    const BANNER_STEP = 25; // vertical spacing per slot (shared by banners and timed rows)
 
     let currentDate = new Date();
     let events = normalizeEvents(JSON.parse(localStorage.getItem('familyScheduleEvents') || '[]'));
@@ -482,10 +480,11 @@
       return ev.startDate !== ev.endDate || ev.allDay;
     }
 
-    function assignBannerSlots(dateKeys) {
+    function assignSlots(dateKeys) {
       const rows = Math.ceil(dateKeys.length / 7);
       const rowSlots = Array.from({ length: rows }, () => []);
-      const assignments = [];
+      const bannerAssignments = [];
+      const dateReserve = {};
       const visibleStart = dateKeys[0];
       const visibleEnd = dateKeys[dateKeys.length - 1];
 
@@ -511,11 +510,35 @@
           }
           slots[slotIndex].push({ start: segStart, end: segEnd });
 
-          assignments.push({ ev, segStart, segEnd, slotIndex });
+          bannerAssignments.push({ ev, segStart, segEnd, slotIndex });
+
+          let cursor = segStart;
+          while (cursor <= segEnd) {
+            dateReserve[cursor] = Math.max(dateReserve[cursor] || 0, slotIndex + 1);
+            cursor = addDays(cursor, 1);
+          }
         }
       });
 
-      return { assignments, slotCounts: rowSlots.map(slots => slots.length) };
+      const nextSlot = { ...dateReserve };
+      const timedAssignments = [];
+      sortEventsForDisplay(events).filter(ev => !isBannerEvent(ev)).forEach(ev => {
+        if (ev.startDate < visibleStart || ev.startDate > visibleEnd) return;
+        const slotIndex = nextSlot[ev.startDate] || 0;
+        nextSlot[ev.startDate] = slotIndex + 1;
+        timedAssignments.push({ ev, date: ev.startDate, slotIndex });
+      });
+
+      const rowMaxSlots = rowSlots.map((_, rowIndex) => {
+        const rowStartIndex = rowIndex * 7;
+        let max = 0;
+        for (let i = rowStartIndex; i < rowStartIndex + 7 && i < dateKeys.length; i++) {
+          max = Math.max(max, nextSlot[dateKeys[i]] || 0);
+        }
+        return max;
+      });
+
+      return { bannerAssignments, timedAssignments, rowMaxSlots };
     }
 
     function renderCalendar() {
@@ -532,14 +555,14 @@
       for (let i = 0; i < totalCells; i++) {
         dateKeys.push(formatDateKey(new Date(year, month, i - firstDay + 1)));
       }
-      const { assignments, slotCounts } = assignBannerSlots(dateKeys);
-      const maxSlots = Math.max(1, ...slotCounts);
+      const { bannerAssignments, timedAssignments, rowMaxSlots } = assignSlots(dateKeys);
+      const maxSlots = Math.max(1, ...rowMaxSlots);
 
       const calendar = document.getElementById('calendar');
       calendar.innerHTML = '';
       calendar.style.setProperty('--rows', totalCells / 7);
       const cellMap = {};
-      const eventBoxMap = {};
+      const numberMap = {};
 
       ['일','월','화','수','목','금','토'].forEach((name, idx) => {
         const dayName = document.createElement('div');
@@ -567,12 +590,8 @@
         number.textContent = date.getDate();
         cell.appendChild(number);
 
-        const eventBox = document.createElement('div');
-        eventBox.className = 'day-events';
-        cell.appendChild(eventBox);
-
         cellMap[dateKey] = cell;
-        eventBoxMap[dateKey] = eventBox;
+        numberMap[dateKey] = number;
 
         cell.addEventListener('mousedown', (e) => {
           if (e.target.closest('button') || e.target.closest('.event-bar') || e.target.closest('.event-row')) return;
@@ -599,21 +618,16 @@
         calendar.appendChild(cell);
       }
 
-      const bannerTop = Math.max(32, (eventBoxMap[dateKeys[0]]?.offsetTop ?? BANNER_TOP) + 4);
+      const sampleCell = cellMap[dateKeys[0]];
+      const sampleNumber = numberMap[dateKeys[0]];
+      const cellRect = sampleCell.getBoundingClientRect();
+      const numberRect = sampleNumber.getBoundingClientRect();
+      const bannerTop = Math.round(numberRect.bottom - cellRect.top) + 4;
       calendar.style.setProperty('--row-min-height', `${bannerTop + maxSlots * BANNER_STEP + 14}px`);
 
       document.getElementById('monthLabel').textContent = formatMonthLabel(currentDate);
-      const dateBarBottom = renderEventBars(assignments, cellMap, bannerTop);
-
-      Object.keys(dateBarBottom).forEach(dateKey => {
-        const eventBox = eventBoxMap[dateKey];
-        if (!eventBox) return;
-        const boxRect = eventBox.getBoundingClientRect();
-        const extra = Math.max(0, dateBarBottom[dateKey] + BANNER_GAP - boxRect.top);
-        if (extra > 0) eventBox.style.paddingTop = `${extra}px`;
-      });
-
-      renderTimedEvents(dateKeys, eventBoxMap);
+      renderEventBars(bannerAssignments, cellMap, bannerTop);
+      renderTimedEvents(timedAssignments, cellMap, bannerTop);
     }
 
     function sortEventsForDisplay(list) {
@@ -626,7 +640,6 @@
     function renderEventBars(assignments, cellMap, bannerTop) {
       const calendar = document.getElementById('calendar');
       calendar.querySelectorAll('.event-bar').forEach(el => el.remove());
-      const dateBarBottom = {};
 
       assignments.forEach(({ ev, segStart, segEnd, slotIndex }) => {
         const startCell = cellMap[segStart];
@@ -695,32 +708,29 @@
         });
 
         calendar.appendChild(bar);
-
-        const barBottom = bar.getBoundingClientRect().bottom;
-        let cursor = segStart;
-        while (cursor <= segEnd) {
-          dateBarBottom[cursor] = Math.max(dateBarBottom[cursor] || 0, barBottom);
-          cursor = addDays(cursor, 1);
-        }
       });
-
-      return dateBarBottom;
     }
 
-    function renderTimedEvents(dateKeys, eventBoxMap) {
-      const visibleStart = dateKeys[0];
-      const visibleEnd = dateKeys[dateKeys.length - 1];
+    function renderTimedEvents(timedAssignments, cellMap, bannerTop) {
+      const calendar = document.getElementById('calendar');
+      calendar.querySelectorAll('.event-row').forEach(el => el.remove());
 
-      sortEventsForDisplay(events).filter(ev => !isBannerEvent(ev)).forEach(ev => {
-        if (ev.startDate < visibleStart || ev.startDate > visibleEnd) return;
-        const eventBox = eventBoxMap[ev.startDate];
-        if (!eventBox) return;
+      timedAssignments.forEach(({ ev, date, slotIndex }) => {
+        const cell = cellMap[date];
+        if (!cell) return;
+
+        const top = cell.offsetTop + bannerTop + slotIndex * BANNER_STEP;
+        const left = cell.offsetLeft + 2;
+        const width = cell.offsetWidth - 4;
 
         const userColors = ev.users.map(u => userMeta[u]?.color).filter(Boolean);
         const segColors = userColors.length ? userColors : [typeMeta[ev.type]?.color || typeMeta.business.color];
 
         const row = document.createElement('div');
         row.className = 'event-row';
+        row.style.top = `${top}px`;
+        row.style.left = `${left}px`;
+        row.style.width = `${width}px`;
 
         const colorLayer = document.createElement('span');
         colorLayer.className = 'event-row-colorlayer';
@@ -744,7 +754,7 @@
           openModal(ev.startDate, ev);
         });
 
-        eventBox.appendChild(row);
+        calendar.appendChild(row);
       });
     }
 
