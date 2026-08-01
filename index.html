@@ -113,7 +113,9 @@
       header { flex-direction: column; align-items: stretch; gap: 10px; margin-bottom: 12px; }
       h1 { font-size: 1.4rem; text-align: center; }
       .legend { justify-content: center; }
-      .controls { justify-content: center; }
+      .controls { justify-content: center; flex-wrap: nowrap; gap: 6px; overflow-x: auto; }
+      .controls button { padding: 7px 9px; font-size: 0.82rem; }
+      .btn-label { display: none; }
       .calendar {
         overflow-x: hidden;
         overflow-y: auto;
@@ -161,7 +163,7 @@
         <button class="secondary-btn" onclick="goToday()">오늘</button>
         <button class="secondary-btn" id="expandToggleBtn" onclick="toggleExpand()">확장</button>
         <button class="primary-btn" id="addEventBtn" onclick="openModal(formatDateKey(currentDate))">+ 일정 추가</button>
-        <button class="secondary-btn" id="helpBtn" onclick="openHelpModal()">❓ 도움말</button>
+        <button class="secondary-btn" id="helpBtn" onclick="openHelpModal()">❓<span class="btn-label"> 도움말</span></button>
       </div>
     </header>
 
