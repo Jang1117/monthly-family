@@ -173,7 +173,7 @@
       <h3>사용 방법</h3>
       <ul class="help-list">
         <li>날짜 칸을 클릭하거나 드래그해서 여러 날짜를 선택하면 일정 추가 창이 열립니다.</li>
-        <li>일정 종류(출장/휴일/외부활동/생일), 참여자, 날짜, 시간, 메모를 입력하고 저장하세요.</li>
+        <li>일정 종류(외부활동/휴일/출장/생일), 참여자, 날짜, 시간, 메모를 입력하고 저장하세요.</li>
         <li>"종일"을 체크하면 시간 없이 하루 종일 일정으로 등록됩니다.</li>
         <li>만들어진 일정 막대를 클릭하면 수정, 드래그하면 날짜 이동, Ctrl을 누른 채 드래그하면 복제됩니다.</li>
         <li>달력 위에서 마우스 휠을 굴리면 이전/다음 달로 이동합니다.</li>
@@ -200,9 +200,9 @@
       <div class="form-group">
         <label>일정 종류</label>
         <div class="type-picker">
-          <button type="button" class="type-btn business active" data-type="business">출장</button>
-          <button type="button" class="type-btn vacation" data-type="vacation">휴일</button>
           <button type="button" class="type-btn external" data-type="external">외부활동</button>
+          <button type="button" class="type-btn vacation" data-type="vacation">휴일</button>
+          <button type="button" class="type-btn business active" data-type="business">출장</button>
           <button type="button" class="type-btn birthday" data-type="birthday">생일</button>
         </div>
       </div>
@@ -268,9 +268,9 @@
     };
 
     const typeMeta = {
-      business: { label: '출장', color: '#ef4444' },
-      vacation: { label: '휴일', color: '#f59e0b' },
       external: { label: '외부활동', color: '#0ea5e9' },
+      vacation: { label: '휴일', color: '#f59e0b' },
+      business: { label: '출장', color: '#ef4444' },
       birthday: { label: '생일', color: '#ec4899' }
     };
 
@@ -545,8 +545,9 @@
         cell.dataset.date = dateKey;
 
         const dayOfWeek = date.getDay();
+        const isHoliday = events.some(ev => ev.type === 'vacation' && ev.startDate <= dateKey && ev.endDate >= dateKey);
         const number = document.createElement('div');
-        number.className = `day-number${(dayOfWeek === 0 || dayOfWeek === 6) ? ' weekend' : ''}`;
+        number.className = `day-number${(dayOfWeek === 0 || dayOfWeek === 6 || isHoliday) ? ' weekend' : ''}`;
         number.textContent = date.getDate();
         cell.appendChild(number);
 
