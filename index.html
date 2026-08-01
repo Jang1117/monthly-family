@@ -538,7 +538,6 @@
       const calendar = document.getElementById('calendar');
       calendar.innerHTML = '';
       calendar.style.setProperty('--rows', totalCells / 7);
-      calendar.style.setProperty('--row-min-height', `${BANNER_TOP + maxSlots * BANNER_STEP + 14}px`);
       const cellMap = {};
       const eventBoxMap = {};
 
@@ -600,8 +599,11 @@
         calendar.appendChild(cell);
       }
 
+      const bannerTop = eventBoxMap[dateKeys[0]]?.offsetTop ?? BANNER_TOP;
+      calendar.style.setProperty('--row-min-height', `${bannerTop + maxSlots * BANNER_STEP + 14}px`);
+
       document.getElementById('monthLabel').textContent = formatMonthLabel(currentDate);
-      const dateBarBottom = renderEventBars(assignments, cellMap);
+      const dateBarBottom = renderEventBars(assignments, cellMap, bannerTop);
 
       Object.keys(dateBarBottom).forEach(dateKey => {
         const eventBox = eventBoxMap[dateKey];
@@ -621,7 +623,7 @@
       });
     }
 
-    function renderEventBars(assignments, cellMap) {
+    function renderEventBars(assignments, cellMap, bannerTop) {
       const calendar = document.getElementById('calendar');
       calendar.querySelectorAll('.event-bar').forEach(el => el.remove());
       const dateBarBottom = {};
@@ -633,7 +635,7 @@
 
         const startLeft = startCell.offsetLeft;
         const endLeft = endCell.offsetLeft + endCell.offsetWidth;
-        const top = startCell.offsetTop + BANNER_TOP + slotIndex * BANNER_STEP;
+        const top = startCell.offsetTop + bannerTop + slotIndex * BANNER_STEP;
         const left = startLeft + 2;
         const width = endLeft - startLeft - 4;
 
