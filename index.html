@@ -282,7 +282,7 @@
     const API_BASE_URL = 'https://monthly-uur4.onrender.com/family'; // 외부 API 호스트를 입력하세요. 로컬 서버 사용 시 ''로 비워두세요.
 
     const BANNER_TOP = 32; // distance from cell top to the first banner slot
-    const BANNER_STEP = 30; // vertical spacing per banner slot
+    const BANNER_STEP = 25; // vertical spacing per banner slot
     const BANNER_GAP = 3; // breathing room below the last banner before timed rows start
 
     let currentDate = new Date();
@@ -599,7 +599,7 @@
         calendar.appendChild(cell);
       }
 
-      const bannerTop = Math.max(28, eventBoxMap[dateKeys[0]]?.offsetTop ?? BANNER_TOP);
+      const bannerTop = Math.max(32, (eventBoxMap[dateKeys[0]]?.offsetTop ?? BANNER_TOP) + 4);
       calendar.style.setProperty('--row-min-height', `${bannerTop + maxSlots * BANNER_STEP + 14}px`);
 
       document.getElementById('monthLabel').textContent = formatMonthLabel(currentDate);
