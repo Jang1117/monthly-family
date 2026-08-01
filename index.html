@@ -53,18 +53,24 @@
     .legend { display:flex; gap:10px; flex-wrap:wrap; flex-shrink:0; }
     .legend-item { display:flex; align-items:center; gap:6px; padding:7px 10px; background:#f8fafc; border:1px solid var(--line); border-radius:999px; font-size:0.92rem; color:#334155; }
     .legend-dot { width:10px; height:10px; border-radius:50%; }
-    .calendar { position:relative; flex:1; min-height:0; display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); grid-template-rows: min-content repeat(var(--rows, 5), 1fr); gap:10px; overflow:hidden; }
+    .calendar { position:relative; flex:1; min-height:0; display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); grid-template-rows: min-content repeat(var(--rows, 5), 1fr); gap:8px; overflow:hidden; }
     .calendar.expanded { overflow-x:hidden; overflow-y:auto; grid-template-rows: min-content repeat(var(--rows, 5), minmax(var(--row-min-height, 130px), auto)); }
-    .event-bar { position:absolute; height:30px; border-radius:16px; color:white; font-size:0.83rem; padding:0 12px; display:flex; align-items:center; justify-content:space-between; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer; box-shadow:0 6px 16px rgba(15,23,42,0.18); z-index:5; }
-    .day-name { text-align:center; padding:8px; background:#f8fafc; border:1px solid var(--line); border-radius:12px; font-weight:700; color:#475569; }
-    .day-name.weekend { color: #ef4444; }
-    .day-cell { min-height:0; overflow:hidden; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:10px; display:flex; flex-direction:column; gap:8px; position:relative; }
+    .event-bar { position:absolute; height:26px; border-radius:6px; border-left:3px solid var(--primary); color: var(--text); font-size:0.78rem; font-weight:600; padding:0 10px 0 9px; display:flex; align-items:center; gap:6px; white-space:nowrap; overflow:hidden; cursor:pointer; box-shadow:none; z-index:5; transition:filter .15s ease, transform .15s ease; }
+    .event-bar:hover { filter:brightness(0.96); }
+    .event-bar-dots { display:flex; align-items:center; gap:3px; flex-shrink:0; }
+    .event-bar-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+    .event-bar-label { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .event-bar-label .meta { font-weight:400; color: var(--muted); }
+    .day-name { text-align:center; padding:4px 4px 10px; background:transparent; border:none; border-bottom:1px solid var(--line); border-radius:0; font-weight:600; font-size:0.76rem; letter-spacing:0.06em; text-transform:uppercase; color:#8b93a7; }
+    .day-name.weekend { color: #e2495c; }
+    .day-cell { min-height:0; overflow:hidden; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:7px 7px 9px; display:flex; flex-direction:column; gap:6px; position:relative; }
     .day-cell.range-selected { box-shadow: inset 0 0 0 3px rgba(79,70,229,0.12); background: linear-gradient(90deg, rgba(99,102,241,0.04), rgba(99,102,241,0.02)); }
     .day-cell.drag-active { outline: 2px dashed rgba(79,70,229,0.15); }
     .day-cell.outside { opacity:0.55; background:#f8fafc; }
-    .day-cell.today { border: 2px solid rgba(79,70,229,0.55); }
-    .day-number { font-weight:700; font-size:0.95rem; }
-    .day-number.weekend { color: #ef4444; }
+    .day-cell.today { border-color: rgba(79,70,229,0.35); background: linear-gradient(180deg, rgba(79,70,229,0.06), rgba(79,70,229,0) 45%); }
+    .day-number { width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:0.82rem; color:#4b5468; border-radius:50%; }
+    .day-number.weekend { color: #e2495c; }
+    .day-cell.today .day-number { background: var(--primary); color:#fff; }
     .day-events { display:flex; flex-direction:column; gap:6px; flex:1; }
     .modal { position:fixed; inset:0; background:rgba(15,23,42,0.45); display:none; align-items:center; justify-content:center; padding:20px; z-index:1000; overflow:auto; }
     .modal.active { display:flex; }
@@ -108,10 +114,10 @@
         gap: 6px;
         grid-template-rows: min-content repeat(var(--rows, 5), minmax(88px, auto));
       }
-      .day-name { font-size: 0.8rem; padding: 6px 4px; }
-      .day-cell { padding: 6px; gap: 4px; }
-      .day-number { font-size: 0.92rem; }
-      .event-bar { font-size: 0.76rem; height: 27px; padding: 0 8px; }
+      .day-name { font-size: 0.68rem; padding: 4px 2px 8px; }
+      .day-cell { padding: 5px; gap: 4px; }
+      .day-number { width: 21px; height: 21px; font-size: 0.78rem; }
+      .event-bar { font-size: 0.72rem; height: 23px; padding: 0 7px 0 6px; gap: 4px; }
       .modal-card { width: min(92vw, 480px); padding: 16px; }
       #addEventBtn { display: none; }
     }
@@ -120,9 +126,9 @@
       h1 { font-size: 1.2rem; }
       .legend-item { font-size: 0.8rem; padding: 5px 8px; }
       button { padding: 8px 12px; font-size: 0.88rem; }
-      .day-name { font-size: 0.72rem; }
-      .day-number { font-size: 0.85rem; }
-      .event-bar { font-size: 0.7rem; height: 25px; }
+      .day-name { font-size: 0.64rem; }
+      .day-number { width: 19px; height: 19px; font-size: 0.72rem; }
+      .event-bar { font-size: 0.66rem; height: 21px; }
     }
   </style>
 </head>
@@ -383,6 +389,22 @@
       return `${event.startTime} - ${event.endTime}`;
     }
 
+    function hexToRgba(hex, alpha) {
+      const clean = (hex || '#94a3b8').replace('#', '');
+      const full = clean.length === 3 ? clean.split('').map(c => c + c).join('') : clean;
+      const num = parseInt(full, 16);
+      const r = (num >> 16) & 255;
+      const g = (num >> 8) & 255;
+      const b = num & 255;
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, ch => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[ch]));
+    }
+
     function getTypeLabel(type = 'business') {
       return typeMeta[type]?.label || typeMeta.business.label;
     }
@@ -495,7 +517,7 @@
       const calendar = document.getElementById('calendar');
       calendar.innerHTML = '';
       calendar.style.setProperty('--rows', totalCells / 7);
-      calendar.style.setProperty('--row-min-height', `${34 + maxSlots * 32 + 16}px`);
+      calendar.style.setProperty('--row-min-height', `${32 + maxSlots * 30 + 14}px`);
       const cellMap = {};
 
       ['일','월','화','수','목','금','토'].forEach((name, idx) => {
@@ -603,7 +625,7 @@
 
           const startLeft = startCell.offsetLeft;
           const endLeft = endCell.offsetLeft + endCell.offsetWidth;
-          const top = startCell.offsetTop + 34 + slotIndex * 32;
+          const top = startCell.offsetTop + 32 + slotIndex * 30;
           const left = startLeft + 2;
           const width = endLeft - startLeft - 4;
 
@@ -613,19 +635,35 @@
           bar.style.left = `${left}px`;
           bar.style.width = `${width}px`;
           const userColors = ev.users.map(u => userMeta[u]?.color).filter(Boolean);
-          bar.style.background = userColors.length > 1
-            ? `linear-gradient(90deg, ${userColors.join(', ')})`
-            : (userColors[0] || typeMeta[ev.type]?.color || typeMeta.business.color);
+          const accentColor = userColors[0] || typeMeta[ev.type]?.color || typeMeta.business.color;
+          bar.style.background = hexToRgba(accentColor, 0.14);
+          bar.style.borderLeftColor = accentColor;
+
+          const dotsWrap = document.createElement('span');
+          dotsWrap.className = 'event-bar-dots';
+          ev.users.forEach(u => {
+            const dot = document.createElement('span');
+            dot.className = 'event-bar-dot';
+            dot.style.background = userMeta[u]?.color || '#94a3b8';
+            dotsWrap.appendChild(dot);
+          });
+          bar.appendChild(dotsWrap);
+
           const namesLabel = ev.users.length >= Object.keys(userMeta).length
             ? '가족'
             : ev.users.map(u => userMeta[u]?.name).filter(Boolean).join(', ');
           const timeLabel = (ev.allDay || isMobileView()) ? '' : `${ev.startTime} `;
+          const timeSpan = timeLabel ? `<span class="meta">${escapeHtml(timeLabel)}</span>` : '';
+          const namesSpan = `<span class="meta">${escapeHtml(namesLabel)}</span>`;
+          const label = document.createElement('span');
+          label.className = 'event-bar-label';
           if (ev.type === 'external') {
-            bar.textContent = ev.memo ? `${timeLabel}${ev.memo} - ${namesLabel}` : `${timeLabel}${namesLabel}`;
+            label.innerHTML = ev.memo ? `${timeSpan}${escapeHtml(ev.memo)} · ${namesSpan}` : `${timeSpan}${namesSpan}`;
           } else {
-            const memoLabel = ev.memo ? `${ev.memo} ` : '';
-            bar.textContent = `${timeLabel}${memoLabel}${getTypeLabel(ev.type)} · ${namesLabel}`;
+            const memoLabel = ev.memo ? `${escapeHtml(ev.memo)} ` : '';
+            label.innerHTML = `${timeSpan}${memoLabel}${escapeHtml(getTypeLabel(ev.type))} · ${namesSpan}`;
           }
+          bar.appendChild(label);
 
           bar.addEventListener('mousedown', (e) => {
             e.stopPropagation();
