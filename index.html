@@ -133,10 +133,10 @@
         <h1>📅 가족 월간 일정표</h1>
       </div>
       <div class="legend">
-        <div class="legend-item"><span class="legend-dot" style="background: var(--seungho);"></span>장승호</div>
-        <div class="legend-item"><span class="legend-dot" style="background: var(--junghyun);"></span>백정현</div>
-        <div class="legend-item"><span class="legend-dot" style="background: var(--ahyeon);"></span>장아현</div>
-        <div class="legend-item"><span class="legend-dot" style="background: var(--haseung);"></span>장하승</div>
+        <div class="legend-item"><span class="legend-dot" style="background: var(--seungho);"></span>승호</div>
+        <div class="legend-item"><span class="legend-dot" style="background: var(--junghyun);"></span>정현</div>
+        <div class="legend-item"><span class="legend-dot" style="background: var(--ahyeon);"></span>아현</div>
+        <div class="legend-item"><span class="legend-dot" style="background: var(--haseung);"></span>하승</div>
       </div>
       <div class="controls">
         <div class="month-nav">
@@ -177,10 +177,10 @@
     <div class="modal-card">
       <h3 id="modalTitle">새 일정 추가</h3>
       <div class="user-picker">
-        <button type="button" class="user-btn seungho" data-user="seungho">장승호</button>
-        <button type="button" class="user-btn junghyun" data-user="junghyun">백정현</button>
-        <button type="button" class="user-btn ahyeon" data-user="ahyeon">장아현</button>
-        <button type="button" class="user-btn haseung" data-user="haseung">장하승</button>
+        <button type="button" class="user-btn seungho" data-user="seungho">승호</button>
+        <button type="button" class="user-btn junghyun" data-user="junghyun">정현</button>
+        <button type="button" class="user-btn ahyeon" data-user="ahyeon">아현</button>
+        <button type="button" class="user-btn haseung" data-user="haseung">하승</button>
       </div>
 
       <div class="form-group">
@@ -246,10 +246,10 @@
 
   <script>
     const userMeta = {
-      seungho: { name: '장승호', color: '#f87171' },
-      junghyun: { name: '백정현', color: '#60a5fa' },
-      ahyeon: { name: '장아현', color: '#34d399' },
-      haseung: { name: '장하승', color: '#a78bfa' }
+      seungho: { name: '승호', color: '#f87171' },
+      junghyun: { name: '정현', color: '#60a5fa' },
+      ahyeon: { name: '아현', color: '#34d399' },
+      haseung: { name: '하승', color: '#a78bfa' }
     };
 
     const typeMeta = {
@@ -617,7 +617,7 @@
             ? `linear-gradient(90deg, ${userColors.join(', ')})`
             : (userColors[0] || typeMeta[ev.type]?.color || typeMeta.business.color);
           const namesLabel = ev.users.length >= Object.keys(userMeta).length
-            ? '팀'
+            ? '가족'
             : ev.users.map(u => userMeta[u]?.name).filter(Boolean).join(', ');
           const timeLabel = (ev.allDay || isMobileView()) ? '' : `${ev.startTime} `;
           if (ev.type === 'external') {
