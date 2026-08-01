@@ -55,8 +55,10 @@
     .legend-dot { width:10px; height:10px; border-radius:50%; }
     .calendar { position:relative; flex:1; min-height:0; display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); grid-template-rows: min-content repeat(var(--rows, 5), 1fr); gap:8px; overflow:hidden; }
     .calendar.expanded { overflow-x:hidden; overflow-y:auto; grid-template-rows: min-content repeat(var(--rows, 5), minmax(var(--row-min-height, 130px), auto)); }
-    .event-bar { position:absolute; height:26px; border-radius:6px; border-left:3px solid var(--primary); color: var(--text); font-size:0.78rem; font-weight:600; padding:0 10px 0 9px; display:flex; align-items:center; white-space:nowrap; overflow:hidden; cursor:pointer; box-shadow:none; z-index:5; transition:filter .15s ease, transform .15s ease; }
+    .event-bar { position:absolute; height:26px; border-radius:6px; color: var(--text); font-size:0.78rem; font-weight:600; padding:0 10px 0 0; display:flex; align-items:center; white-space:nowrap; overflow:hidden; cursor:pointer; box-shadow:none; z-index:5; transition:filter .15s ease, transform .15s ease; }
     .event-bar:hover { filter:brightness(0.96); }
+    .event-bar-stripe { width:4px; height:100%; flex-shrink:0; margin-right:8px; display:flex; flex-direction:column; overflow:hidden; border-radius:2px; }
+    .event-bar-stripe-seg { flex:1; }
     .event-bar-label { min-width:0; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .event-bar-label .meta { font-weight:400; color: var(--muted); }
     .day-name { text-align:center; padding:4px 4px 10px; background:transparent; border:none; border-bottom:1px solid var(--line); border-radius:0; font-weight:600; font-size:0.76rem; letter-spacing:0.06em; text-transform:uppercase; color:#8b93a7; }
@@ -633,9 +635,18 @@
           bar.style.left = `${left}px`;
           bar.style.width = `${width}px`;
           const userColors = ev.users.map(u => userMeta[u]?.color).filter(Boolean);
-          const accentColor = userColors[0] || typeMeta[ev.type]?.color || typeMeta.business.color;
-          bar.style.background = hexToRgba(accentColor, 0.14);
-          bar.style.borderLeftColor = accentColor;
+          const stripeColors = userColors.length ? userColors : [typeMeta[ev.type]?.color || typeMeta.business.color];
+          bar.style.background = hexToRgba(stripeColors[0], 0.14);
+
+          const stripe = document.createElement('span');
+          stripe.className = 'event-bar-stripe';
+          stripeColors.forEach(c => {
+            const seg = document.createElement('span');
+            seg.className = 'event-bar-stripe-seg';
+            seg.style.background = c;
+            stripe.appendChild(seg);
+          });
+          bar.appendChild(stripe);
 
           const namesLabel = ev.users.length >= Object.keys(userMeta).length
             ? '가족'
