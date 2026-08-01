@@ -708,7 +708,8 @@
         const text = document.createElement('span');
         text.className = 'event-row-text';
         const title = ev.memo || getTypeLabel(ev.type);
-        text.innerHTML = `<span class="time">${escapeHtml(ev.startTime)}</span> ${escapeHtml(title)}`;
+        const timeSpan = isMobileView() ? '' : `<span class="time">${escapeHtml(ev.startTime)}</span> `;
+        text.innerHTML = `${timeSpan}${escapeHtml(title)}`;
         row.appendChild(text);
 
         row.addEventListener('click', (e) => {
