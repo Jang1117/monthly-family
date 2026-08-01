@@ -473,14 +473,17 @@
       return ev.startDate !== ev.endDate || ev.allDay;
     }
 
-    function computeRowSlotCounts(dateKeys) {
+    function assignBannerSlots(dateKeys) {
       const rows = Math.ceil(dateKeys.length / 7);
       const rowSlots = Array.from({ length: rows }, () => []);
-      events.filter(isBannerEvent).forEach(ev => {
+      const dateReserve = {};
+      const assignments = [];
+      const visibleStart = dateKeys[0];
+      const visibleEnd = dateKeys[dateKeys.length - 1];
+
+      events.filter(isBannerEvent).sort((a, b) => Number(a.id) - Number(b.id)).forEach(ev => {
         const eventStart = ev.startDate;
         const eventEnd = ev.endDate;
-        const visibleStart = dateKeys[0];
-        const visibleEnd = dateKeys[dateKeys.length - 1];
         if (eventEnd < visibleStart || eventStart > visibleEnd) return;
 
         for (let rowIndex = 0; rowIndex < rows; rowIndex++) {
@@ -493,12 +496,24 @@
           if (segStart > segEnd) continue;
 
           const slots = rowSlots[rowIndex];
-          const slotIndex = slots.findIndex(ranges => !ranges.some(r => segStart <= r.end && segEnd >= r.start));
-          if (slotIndex === -1) slots.push([{ start: segStart, end: segEnd }]);
-          else slots[slotIndex].push({ start: segStart, end: segEnd });
+          let slotIndex = slots.findIndex(ranges => !ranges.some(r => segStart <= r.end && segEnd >= r.start));
+          if (slotIndex === -1) {
+            slotIndex = slots.length;
+            slots.push([]);
+          }
+          slots[slotIndex].push({ start: segStart, end: segEnd });
+
+          assignments.push({ ev, segStart, segEnd, slotIndex });
+
+          let cursor = segStart;
+          while (cursor <= segEnd) {
+            dateReserve[cursor] = Math.max(dateReserve[cursor] || 0, slotIndex + 1);
+            cursor = addDays(cursor, 1);
+          }
         }
       });
-      return rowSlots.map(slots => slots.length);
+
+      return { assignments, dateReserve, slotCounts: rowSlots.map(slots => slots.length) };
     }
 
     function renderCalendar() {
@@ -515,7 +530,7 @@
       for (let i = 0; i < totalCells; i++) {
         dateKeys.push(formatDateKey(new Date(year, month, i - firstDay + 1)));
       }
-      const slotCounts = computeRowSlotCounts(dateKeys);
+      const { assignments, dateReserve, slotCounts } = assignBannerSlots(dateKeys);
       const maxSlots = Math.max(1, ...slotCounts);
 
       const calendar = document.getElementById('calendar');
@@ -553,8 +568,7 @@
 
         const eventBox = document.createElement('div');
         eventBox.className = 'day-events';
-        const rowIndex = Math.floor(i / 7);
-        eventBox.style.paddingTop = slotCounts[rowIndex] ? `${slotCounts[rowIndex] * 30 + 4}px` : '2px';
+        eventBox.style.paddingTop = dateReserve[dateKey] ? `${dateReserve[dateKey] * 30 + 4}px` : '2px';
         cell.appendChild(eventBox);
 
         cellMap[dateKey] = cell;
@@ -586,7 +600,7 @@
       }
 
       document.getElementById('monthLabel').textContent = formatMonthLabel(currentDate);
-      renderEventBars(dateKeys, cellMap);
+      renderEventBars(assignments, cellMap);
       renderTimedEvents(dateKeys, eventBoxMap);
     }
 
@@ -597,105 +611,77 @@
       });
     }
 
-    function renderEventBars(dateKeys, cellMap) {
+    function renderEventBars(assignments, cellMap) {
       const calendar = document.getElementById('calendar');
       calendar.querySelectorAll('.event-bar').forEach(el => el.remove());
-      const rows = Math.ceil(dateKeys.length / 7);
-      // Per row, track which date-ranges occupy each vertical slot so only
-      // segments that actually overlap in date get stacked below one another.
-      const rowSlots = Array.from({ length: rows }, () => []);
 
-      events.filter(isBannerEvent).sort((a, b) => Number(a.id) - Number(b.id)).forEach(ev => {
-        const eventStart = ev.startDate;
-        const eventEnd = ev.endDate;
-        const visibleStart = dateKeys[0];
-        const visibleEnd = dateKeys[dateKeys.length - 1];
-        if (eventEnd < visibleStart || eventStart > visibleEnd) return;
+      assignments.forEach(({ ev, segStart, segEnd, slotIndex }) => {
+        const startCell = cellMap[segStart];
+        const endCell = cellMap[segEnd];
+        if (!startCell || !endCell) return;
 
-        for (let rowIndex = 0; rowIndex < rows; rowIndex++) {
-          const rowStartIndex = rowIndex * 7;
-          const rowEndIndex = rowStartIndex + 6;
-          const rowStartDate = dateKeys[rowStartIndex];
-          const rowEndDate = dateKeys[rowEndIndex];
-          const segStart = eventStart > rowStartDate ? eventStart : rowStartDate;
-          const segEnd = eventEnd < rowEndDate ? eventEnd : rowEndDate;
-          if (segStart > segEnd) continue;
+        const startLeft = startCell.offsetLeft;
+        const endLeft = endCell.offsetLeft + endCell.offsetWidth;
+        const top = startCell.offsetTop + 32 + slotIndex * 30;
+        const left = startLeft + 2;
+        const width = endLeft - startLeft - 4;
 
-          const startCell = cellMap[segStart];
-          const endCell = cellMap[segEnd];
-          if (!startCell || !endCell) continue;
+        const bar = document.createElement('div');
+        bar.className = 'event-bar';
+        bar.style.top = `${top}px`;
+        bar.style.left = `${left}px`;
+        bar.style.width = `${width}px`;
+        const userColors = ev.users.map(u => userMeta[u]?.color).filter(Boolean);
+        const segColors = userColors.length ? userColors : [typeMeta[ev.type]?.color || typeMeta.business.color];
 
-          const slots = rowSlots[rowIndex];
-          let slotIndex = slots.findIndex(ranges => !ranges.some(r => segStart <= r.end && segEnd >= r.start));
-          if (slotIndex === -1) {
-            slotIndex = slots.length;
-            slots.push([]);
-          }
-          slots[slotIndex].push({ start: segStart, end: segEnd });
+        const colorLayer = document.createElement('span');
+        colorLayer.className = 'event-bar-colorlayer';
+        segColors.forEach(c => {
+          const seg = document.createElement('span');
+          seg.className = 'event-bar-color-seg';
+          seg.style.background = c;
+          colorLayer.appendChild(seg);
+        });
+        bar.appendChild(colorLayer);
 
-          const startLeft = startCell.offsetLeft;
-          const endLeft = endCell.offsetLeft + endCell.offsetWidth;
-          const top = startCell.offsetTop + 32 + slotIndex * 30;
-          const left = startLeft + 2;
-          const width = endLeft - startLeft - 4;
-
-          const bar = document.createElement('div');
-          bar.className = 'event-bar';
-          bar.style.top = `${top}px`;
-          bar.style.left = `${left}px`;
-          bar.style.width = `${width}px`;
-          const userColors = ev.users.map(u => userMeta[u]?.color).filter(Boolean);
-          const segColors = userColors.length ? userColors : [typeMeta[ev.type]?.color || typeMeta.business.color];
-
-          const colorLayer = document.createElement('span');
-          colorLayer.className = 'event-bar-colorlayer';
-          segColors.forEach(c => {
-            const seg = document.createElement('span');
-            seg.className = 'event-bar-color-seg';
-            seg.style.background = c;
-            colorLayer.appendChild(seg);
-          });
-          bar.appendChild(colorLayer);
-
-          const namesLabel = ev.users.length >= Object.keys(userMeta).length
-            ? '가족'
-            : ev.users.map(u => userMeta[u]?.name).filter(Boolean).join(', ');
-          const timeLabel = (ev.allDay || isMobileView()) ? '' : `${ev.startTime} `;
-          const timeSpan = timeLabel ? `<span class="meta">${escapeHtml(timeLabel)}</span>` : '';
-          const namesSpan = `<span class="meta">${escapeHtml(namesLabel)}</span>`;
-          const label = document.createElement('span');
-          label.className = 'event-bar-label';
-          if (ev.type === 'external') {
-            label.innerHTML = ev.memo ? `${timeSpan}${escapeHtml(ev.memo)} · ${namesSpan}` : `${timeSpan}${namesSpan}`;
-          } else {
-            const memoLabel = ev.memo ? `${escapeHtml(ev.memo)} ` : '';
-            label.innerHTML = `${timeSpan}${memoLabel}${escapeHtml(getTypeLabel(ev.type))} · ${namesSpan}`;
-          }
-          bar.appendChild(label);
-
-          bar.addEventListener('mousedown', (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            const allCells = document.querySelectorAll('.day-cell');
-            const sampleCell = allCells[0];
-            const cellWidth = sampleCell ? sampleCell.offsetWidth : 100;
-            let rowHeight = sampleCell ? sampleCell.offsetHeight : 100;
-            if (allCells.length > 7) {
-              rowHeight = allCells[7].getBoundingClientRect().top - allCells[0].getBoundingClientRect().top;
-            }
-            dragEventState = { active: true, eventId: ev.id, originalStart: ev.startDate, originalEnd: ev.endDate, startX: e.clientX, startY: e.clientY, lastDeltaDays: 0, bar, cellWidth, rowHeight };
-            bar.classList.add('dragging');
-          });
-
-          bar.addEventListener('click', (e) => {
-            if (isMobileView()) return;
-            if (dragEventState && dragEventState.active) return;
-            e.stopPropagation();
-            openModal(segStart, ev);
-          });
-
-          calendar.appendChild(bar);
+        const namesLabel = ev.users.length >= Object.keys(userMeta).length
+          ? '가족'
+          : ev.users.map(u => userMeta[u]?.name).filter(Boolean).join(', ');
+        const timeLabel = (ev.allDay || isMobileView()) ? '' : `${ev.startTime} `;
+        const timeSpan = timeLabel ? `<span class="meta">${escapeHtml(timeLabel)}</span>` : '';
+        const namesSpan = `<span class="meta">${escapeHtml(namesLabel)}</span>`;
+        const label = document.createElement('span');
+        label.className = 'event-bar-label';
+        if (ev.type === 'external') {
+          label.innerHTML = ev.memo ? `${timeSpan}${escapeHtml(ev.memo)} · ${namesSpan}` : `${timeSpan}${namesSpan}`;
+        } else {
+          const memoLabel = ev.memo ? `${escapeHtml(ev.memo)} ` : '';
+          label.innerHTML = `${timeSpan}${memoLabel}${escapeHtml(getTypeLabel(ev.type))} · ${namesSpan}`;
         }
+        bar.appendChild(label);
+
+        bar.addEventListener('mousedown', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          const allCells = document.querySelectorAll('.day-cell');
+          const sampleCell = allCells[0];
+          const cellWidth = sampleCell ? sampleCell.offsetWidth : 100;
+          let rowHeight = sampleCell ? sampleCell.offsetHeight : 100;
+          if (allCells.length > 7) {
+            rowHeight = allCells[7].getBoundingClientRect().top - allCells[0].getBoundingClientRect().top;
+          }
+          dragEventState = { active: true, eventId: ev.id, originalStart: ev.startDate, originalEnd: ev.endDate, startX: e.clientX, startY: e.clientY, lastDeltaDays: 0, bar, cellWidth, rowHeight };
+          bar.classList.add('dragging');
+        });
+
+        bar.addEventListener('click', (e) => {
+          if (isMobileView()) return;
+          if (dragEventState && dragEventState.active) return;
+          e.stopPropagation();
+          openModal(segStart, ev);
+        });
+
+        calendar.appendChild(bar);
       });
     }
 
