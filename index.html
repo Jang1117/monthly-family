@@ -568,7 +568,7 @@
 
         const eventBox = document.createElement('div');
         eventBox.className = 'day-events';
-        eventBox.style.paddingTop = dateReserve[dateKey] ? `${dateReserve[dateKey] * 30 + 4}px` : '2px';
+        eventBox.style.paddingTop = dateReserve[dateKey] ? `${dateReserve[dateKey] * 30 - 6}px` : '2px';
         cell.appendChild(eventBox);
 
         cellMap[dateKey] = cell;
