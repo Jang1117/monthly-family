@@ -61,7 +61,7 @@
     .event-bar-color-seg { flex:1; }
     .event-bar-label { position:relative; z-index:1; min-width:0; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .event-bar-label .meta { font-weight:400; color: rgba(255,255,255,0.85); }
-    .event-row { position:relative; display:flex; align-items:center; height:22px; font-size:0.74rem; color:#fff; font-weight:600; cursor:pointer; padding:0 8px; border-radius:5px; overflow:hidden; }
+    .event-row { position:relative; display:flex; align-items:center; height:22px; font-size:0.78rem; color:#fff; font-weight:600; cursor:pointer; padding:0 8px; border-radius:5px; overflow:hidden; }
     .event-row:hover { filter:brightness(0.96); }
     .event-row-colorlayer { position:absolute; inset:0; display:flex; z-index:0; }
     .event-row-color-seg { flex:1; }
@@ -69,7 +69,7 @@
     .event-row-text .time { font-variant-numeric:tabular-nums; color:rgba(255,255,255,0.85); }
     .day-name { text-align:center; padding:4px 4px 10px; background:transparent; border:none; border-bottom:1px solid var(--line); border-radius:0; font-weight:600; font-size:0.76rem; letter-spacing:0.06em; text-transform:uppercase; color:#8b93a7; }
     .day-name.weekend { color: #e2495c; }
-    .day-cell { min-height:0; overflow:hidden; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:7px 7px 9px; display:flex; flex-direction:column; gap:6px; position:relative; }
+    .day-cell { min-height:0; overflow:hidden; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:7px 7px 9px; display:flex; flex-direction:column; gap:2px; position:relative; }
     .day-cell.range-selected { box-shadow: inset 0 0 0 3px rgba(79,70,229,0.12); background: linear-gradient(90deg, rgba(99,102,241,0.04), rgba(99,102,241,0.02)); }
     .day-cell.drag-active { outline: 2px dashed rgba(79,70,229,0.15); }
     .day-cell.outside { opacity:0.55; background:#f8fafc; }
@@ -124,10 +124,10 @@
         grid-template-rows: min-content repeat(var(--rows, 5), minmax(88px, auto));
       }
       .day-name { font-size: 0.68rem; padding: 4px 2px 8px; }
-      .day-cell { padding: 5px; gap: 4px; }
+      .day-cell { padding: 5px; gap: 2px; }
       .day-number { width: 21px; height: 21px; font-size: 0.78rem; }
       .event-bar { font-size: 0.72rem; height: 23px; padding: 0 7px 0 6px; }
-      .event-row { font-size: 0.7rem; gap: 4px; }
+      .event-row { font-size: 0.72rem; }
       .modal-card { width: min(92vw, 480px); padding: 16px; }
       #addEventBtn { display: none; }
       .time-select-group select { font-size: 0.8rem; padding: 8px 2px; }
@@ -573,7 +573,7 @@
 
         const eventBox = document.createElement('div');
         eventBox.className = 'day-events';
-        eventBox.style.paddingTop = dateReserve[dateKey] ? `${dateReserve[dateKey] * 30 - 6}px` : '2px';
+        eventBox.style.paddingTop = dateReserve[dateKey] ? `${dateReserve[dateKey] * 30 - 6}px` : '0px';
         cell.appendChild(eventBox);
 
         cellMap[dateKey] = cell;
