@@ -63,7 +63,8 @@
     .event-bar-label .meta { font-weight:400; color: rgba(255,255,255,0.85); }
     .event-row { display:flex; align-items:center; gap:5px; font-size:0.74rem; color:var(--text); cursor:pointer; padding:1px 2px; border-radius:4px; }
     .event-row:hover { background:#f1f3f9; }
-    .event-row-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+    .event-row-swatch { display:flex; width:10px; height:8px; border-radius:2px; overflow:hidden; flex-shrink:0; }
+    .event-row-swatch-seg { flex:1; }
     .event-row-text { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .event-row-text .time { font-variant-numeric:tabular-nums; color:var(--muted); }
     .day-name { text-align:center; padding:4px 4px 10px; background:transparent; border:none; border-bottom:1px solid var(--line); border-radius:0; font-weight:600; font-size:0.76rem; letter-spacing:0.06em; text-transform:uppercase; color:#8b93a7; }
@@ -699,15 +700,20 @@
         if (!eventBox) return;
 
         const userColors = ev.users.map(u => userMeta[u]?.color).filter(Boolean);
-        const dotColor = userColors[0] || typeMeta[ev.type]?.color || typeMeta.business.color;
+        const swatchColors = userColors.length ? userColors : [typeMeta[ev.type]?.color || typeMeta.business.color];
 
         const row = document.createElement('div');
         row.className = 'event-row';
 
-        const dot = document.createElement('span');
-        dot.className = 'event-row-dot';
-        dot.style.background = dotColor;
-        row.appendChild(dot);
+        const swatch = document.createElement('span');
+        swatch.className = 'event-row-swatch';
+        swatchColors.forEach(c => {
+          const seg = document.createElement('span');
+          seg.className = 'event-row-swatch-seg';
+          seg.style.background = c;
+          swatch.appendChild(seg);
+        });
+        row.appendChild(swatch);
 
         const text = document.createElement('span');
         text.className = 'event-row-text';
