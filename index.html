@@ -258,7 +258,7 @@
       external: { label: '외부활동', color: '#0ea5e9' }
     };
 
-    const API_BASE_URL = ''; // 외부 API 호스트를 입력하세요. 로컬 서버 사용 시 ''로 비워두세요.
+    const API_BASE_URL = 'https://monthly-uur4.onrender.com/family'; // 외부 API 호스트를 입력하세요. 로컬 서버 사용 시 ''로 비워두세요.
 
     let currentDate = new Date();
     let events = normalizeEvents(JSON.parse(localStorage.getItem('familyScheduleEvents') || '[]'));
