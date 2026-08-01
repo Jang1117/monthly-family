@@ -74,7 +74,7 @@
     .day-cell.drag-active { outline: 2px dashed rgba(79,70,229,0.15); }
     .day-cell.outside { opacity:0.55; background:#f8fafc; }
     .day-cell.today { border-color: rgba(79,70,229,0.35); background: linear-gradient(180deg, rgba(79,70,229,0.06), rgba(79,70,229,0) 45%); }
-    .day-number { width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:0.82rem; color:#4b5468; border-radius:50%; }
+    .day-number { position:relative; z-index:6; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:0.82rem; color:#4b5468; border-radius:50%; flex-shrink:0; }
     .day-number.weekend { color: #e2495c; }
     .day-cell.today .day-number { background: var(--primary); color:#fff; }
     .day-events { display:flex; flex-direction:column; gap:3px; flex:1; min-height:0; overflow:hidden; }
@@ -599,7 +599,7 @@
         calendar.appendChild(cell);
       }
 
-      const bannerTop = eventBoxMap[dateKeys[0]]?.offsetTop ?? BANNER_TOP;
+      const bannerTop = Math.max(28, eventBoxMap[dateKeys[0]]?.offsetTop ?? BANNER_TOP);
       calendar.style.setProperty('--row-min-height', `${bannerTop + maxSlots * BANNER_STEP + 14}px`);
 
       document.getElementById('monthLabel').textContent = formatMonthLabel(currentDate);
