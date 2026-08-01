@@ -261,7 +261,7 @@
     const API_BASE_URL = ''; // 외부 API 호스트를 입력하세요. 로컬 서버 사용 시 ''로 비워두세요.
 
     let currentDate = new Date();
-    let events = normalizeEvents(JSON.parse(localStorage.getItem('monthlyScheduleEvents') || '[]'));
+    let events = normalizeEvents(JSON.parse(localStorage.getItem('familyScheduleEvents') || '[]'));
     let selectedUsers = [];
     let selectedType = 'business';
     let editingEventId = null;
@@ -393,12 +393,12 @@
         if (!res.ok) throw new Error('API returned ' + res.status);
         const list = await res.json();
         events = normalizeEvents(list);
-        localStorage.setItem('monthlyScheduleEvents', JSON.stringify(events));
+        localStorage.setItem('familyScheduleEvents', JSON.stringify(events));
         renderCalendar();
       } catch (e) {
         console.warn('Failed to load events from server, falling back to localStorage', e);
         try {
-          const stored = JSON.parse(localStorage.getItem('monthlyScheduleEvents') || '[]');
+          const stored = JSON.parse(localStorage.getItem('familyScheduleEvents') || '[]');
           events = normalizeEvents(stored);
         } catch (ee) {
           events = [];
@@ -414,11 +414,11 @@
         return res.json();
       } catch (e) {
         // fallback: save to localStorage
-        const list = JSON.parse(localStorage.getItem('monthlyScheduleEvents') || '[]');
+        const list = JSON.parse(localStorage.getItem('familyScheduleEvents') || '[]');
         const id = Date.now().toString();
         const created = { ...ev, id };
         list.push(created);
-        localStorage.setItem('monthlyScheduleEvents', JSON.stringify(list));
+        localStorage.setItem('familyScheduleEvents', JSON.stringify(list));
         return created;
       }
     }
@@ -429,9 +429,9 @@
         if (!res.ok) throw new Error('API update failed ' + res.status);
       } catch (e) {
         // fallback: update localStorage
-        const list = JSON.parse(localStorage.getItem('monthlyScheduleEvents') || '[]');
+        const list = JSON.parse(localStorage.getItem('familyScheduleEvents') || '[]');
         const updated = list.map(item => item.id === id ? { ...item, ...ev, id } : item);
-        localStorage.setItem('monthlyScheduleEvents', JSON.stringify(updated));
+        localStorage.setItem('familyScheduleEvents', JSON.stringify(updated));
       }
     }
 
@@ -441,9 +441,9 @@
         if (!res.ok) throw new Error('API delete failed ' + res.status);
       } catch (e) {
         // fallback: delete from localStorage
-        const list = JSON.parse(localStorage.getItem('monthlyScheduleEvents') || '[]');
+        const list = JSON.parse(localStorage.getItem('familyScheduleEvents') || '[]');
         const updated = list.filter(item => item.id !== id);
-        localStorage.setItem('monthlyScheduleEvents', JSON.stringify(updated));
+        localStorage.setItem('familyScheduleEvents', JSON.stringify(updated));
       }
     }
 
@@ -746,7 +746,7 @@
       }
       // update local cache so page works offline / on GitHub Pages
       try {
-        localStorage.setItem('monthlyScheduleEvents', JSON.stringify(events));
+        localStorage.setItem('familyScheduleEvents', JSON.stringify(events));
       } catch (e) {}
       closeModal();
       renderCalendar();
@@ -757,7 +757,7 @@
 
       await apiDeleteEvent(editingEventId);
       events = events.filter(ev => ev.id !== editingEventId);
-      try { localStorage.setItem('monthlyScheduleEvents', JSON.stringify(events)); } catch (e) {}
+      try { localStorage.setItem('familyScheduleEvents', JSON.stringify(events)); } catch (e) {}
       closeModal();
       renderCalendar();
     }
@@ -865,7 +865,7 @@
               delete payload.id;
               const created = await apiCreateEvent(payload);
               events.push(normalizeEvents([created])[0]);
-              try { localStorage.setItem('monthlyScheduleEvents', JSON.stringify(events)); } catch (err) {}
+              try { localStorage.setItem('familyScheduleEvents', JSON.stringify(events)); } catch (err) {}
               renderCalendar();
             }
           } else {
