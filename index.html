@@ -200,9 +200,9 @@
       <div class="form-group">
         <label>일정 종류</label>
         <div class="type-picker">
-          <button type="button" class="type-btn external" data-type="external">외부활동</button>
+          <button type="button" class="type-btn external active" data-type="external">외부활동</button>
           <button type="button" class="type-btn vacation" data-type="vacation">휴일</button>
-          <button type="button" class="type-btn business active" data-type="business">출장</button>
+          <button type="button" class="type-btn business" data-type="business">출장</button>
           <button type="button" class="type-btn birthday" data-type="birthday">생일</button>
         </div>
       </div>
@@ -279,7 +279,7 @@
     let currentDate = new Date();
     let events = normalizeEvents(JSON.parse(localStorage.getItem('familyScheduleEvents') || '[]'));
     let selectedUsers = [];
-    let selectedType = 'business';
+    let selectedType = 'external';
     let editingEventId = null;
     let dragSelection = null;
     let dragEventState = null;
@@ -758,7 +758,7 @@
 
       editingEventId = event ? event.id : null;
       selectedUsers = event ? [...event.users] : [];
-      selectedType = event?.type || 'business';
+      selectedType = event?.type || 'external';
       updateUserButtons();
       updateTypeButtons();
 
@@ -800,7 +800,7 @@
       });
       document.getElementById('startTime').disabled = false;
       document.getElementById('endTime').disabled = false;
-      selectedType = 'business';
+      selectedType = 'external';
       updateTypeButtons();
     }
 
