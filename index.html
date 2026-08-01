@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ENG팀 월간 일정표</title>
+  <title>가족 월간 일정표</title>
   <style>
     :root {
       --bg: #eef4ff;
@@ -12,9 +12,10 @@
       --text: #1f2937;
       --muted: #6b7280;
       --line: #e5e7eb;
-      --yang: #f87171;
-      --jang: #60a5fa;
-      --kwon: #34d399;
+      --seungho: #f87171;
+      --junghyun: #60a5fa;
+      --ahyeon: #34d399;
+      --haseung: #a78bfa;
     }
 
     * { box-sizing: border-box; }
@@ -68,15 +69,15 @@
     .modal { position:fixed; inset:0; background:rgba(15,23,42,0.45); display:none; align-items:center; justify-content:center; padding:20px; z-index:1000; overflow:auto; }
     .modal.active { display:flex; }
     .modal-card { width:min(520px,100%); background:white; border-radius:18px; padding:24px; box-shadow:0 20px 55px rgba(15,23,42,0.24); }
-    .user-picker { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:12px 0 16px; }
+    .user-picker { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin:12px 0 16px; }
     .user-btn { padding:10px 8px; border:1px solid var(--line); border-radius:12px; background:#f8fafc; color:#334155; font-weight:700; }
-    .user-btn.yang.active { background: rgba(248,113,113,0.12); border-color: var(--yang); color: var(--yang); }
-    .user-btn.jang.active { background: rgba(96,165,250,0.12); border-color: var(--jang); color: var(--jang); }
-    .user-btn.kwon.active { background: rgba(52,211,153,0.12); border-color: var(--kwon); color: var(--kwon); }
-    .type-picker { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:6px; }
+    .user-btn.seungho.active { background: rgba(248,113,113,0.12); border-color: var(--seungho); color: var(--seungho); }
+    .user-btn.junghyun.active { background: rgba(96,165,250,0.12); border-color: var(--junghyun); color: var(--junghyun); }
+    .user-btn.ahyeon.active { background: rgba(52,211,153,0.12); border-color: var(--ahyeon); color: var(--ahyeon); }
+    .user-btn.haseung.active { background: rgba(167,139,250,0.12); border-color: var(--haseung); color: var(--haseung); }
+    .type-picker { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin-top:6px; }
     .type-btn { padding:10px 8px; border:1px solid var(--line); border-radius:12px; background:#f8fafc; color:#334155; font-weight:700; cursor:pointer; }
     .type-btn.active { color: white; }
-    .type-btn.general.active { background: var(--primary); border-color: var(--primary); }
     .type-btn.business.active { background: #ef4444; border-color: #ef4444; }
     .type-btn.vacation.active { background: #f59e0b; border-color: #f59e0b; }
     .type-btn.external.active { background: #0ea5e9; border-color: #0ea5e9; }
@@ -129,12 +130,13 @@
   <div class="container">
     <header>
       <div>
-        <h1>📅 ENG팀 월간 일정표</h1>
+        <h1>📅 가족 월간 일정표</h1>
       </div>
       <div class="legend">
-        <div class="legend-item"><span class="legend-dot" style="background: var(--yang);"></span>양성민</div>
-        <div class="legend-item"><span class="legend-dot" style="background: var(--jang);"></span>장승호</div>
-        <div class="legend-item"><span class="legend-dot" style="background: var(--kwon);"></span>권두훈</div>
+        <div class="legend-item"><span class="legend-dot" style="background: var(--seungho);"></span>장승호</div>
+        <div class="legend-item"><span class="legend-dot" style="background: var(--junghyun);"></span>백정현</div>
+        <div class="legend-item"><span class="legend-dot" style="background: var(--ahyeon);"></span>장아현</div>
+        <div class="legend-item"><span class="legend-dot" style="background: var(--haseung);"></span>장하승</div>
       </div>
       <div class="controls">
         <div class="month-nav">
@@ -157,7 +159,7 @@
       <h3>사용 방법</h3>
       <ul class="help-list">
         <li>날짜 칸을 클릭하거나 드래그해서 여러 날짜를 선택하면 일정 추가 창이 열립니다.</li>
-        <li>일정 종류(회의/출장/휴일/외부활동), 참여자, 날짜, 시간, 메모를 입력하고 저장하세요.</li>
+        <li>일정 종류(출장/휴일/외부활동), 참여자, 날짜, 시간, 메모를 입력하고 저장하세요.</li>
         <li>"종일"을 체크하면 시간 없이 하루 종일 일정으로 등록됩니다.</li>
         <li>만들어진 일정 막대를 클릭하면 수정, 드래그하면 날짜 이동, Ctrl을 누른 채 드래그하면 복제됩니다.</li>
         <li>달력 위에서 마우스 휠을 굴리면 이전/다음 달로 이동합니다.</li>
@@ -175,16 +177,16 @@
     <div class="modal-card">
       <h3 id="modalTitle">새 일정 추가</h3>
       <div class="user-picker">
-        <button type="button" class="user-btn yang" data-user="yang">양성민</button>
-        <button type="button" class="user-btn jang" data-user="jang">장승호</button>
-        <button type="button" class="user-btn kwon" data-user="kwon">권두훈</button>
+        <button type="button" class="user-btn seungho" data-user="seungho">장승호</button>
+        <button type="button" class="user-btn junghyun" data-user="junghyun">백정현</button>
+        <button type="button" class="user-btn ahyeon" data-user="ahyeon">장아현</button>
+        <button type="button" class="user-btn haseung" data-user="haseung">장하승</button>
       </div>
 
       <div class="form-group">
         <label>일정 종류</label>
         <div class="type-picker">
-          <button type="button" class="type-btn general active" data-type="general">회의</button>
-          <button type="button" class="type-btn business" data-type="business">출장</button>
+          <button type="button" class="type-btn business active" data-type="business">출장</button>
           <button type="button" class="type-btn vacation" data-type="vacation">휴일</button>
           <button type="button" class="type-btn external" data-type="external">외부활동</button>
         </div>
@@ -244,24 +246,24 @@
 
   <script>
     const userMeta = {
-      yang: { name: '양성민', color: '#f87171' },
-      jang: { name: '장승호', color: '#60a5fa' },
-      kwon: { name: '권두훈', color: '#34d399' }
+      seungho: { name: '장승호', color: '#f87171' },
+      junghyun: { name: '백정현', color: '#60a5fa' },
+      ahyeon: { name: '장아현', color: '#34d399' },
+      haseung: { name: '장하승', color: '#a78bfa' }
     };
 
     const typeMeta = {
-      general: { label: '회의', color: '#4f46e5' },
       business: { label: '출장', color: '#ef4444' },
       vacation: { label: '휴일', color: '#f59e0b' },
       external: { label: '외부활동', color: '#0ea5e9' }
     };
 
-    const API_BASE_URL = 'https://monthly-uur4.onrender.com'; // 외부 API 호스트를 입력하세요. 로컬 서버 사용 시 ''로 비워두세요.
+    const API_BASE_URL = ''; // 외부 API 호스트를 입력하세요. 로컬 서버 사용 시 ''로 비워두세요.
 
     let currentDate = new Date();
     let events = normalizeEvents(JSON.parse(localStorage.getItem('monthlyScheduleEvents') || '[]'));
     let selectedUsers = [];
-    let selectedType = 'general';
+    let selectedType = 'business';
     let editingEventId = null;
     let dragSelection = null;
     let dragEventState = null;
@@ -295,7 +297,7 @@
       return list.map((ev, index) => {
         const startDate = ev.startDate || ev.date || formatDateKey(new Date());
         let users = Array.isArray(ev.users) ? ev.users.filter(u => userMeta[u]) : (ev.user ? [ev.user] : []);
-        if (users.length === 0) users = ['yang'];
+        if (users.length === 0) users = ['seungho'];
         return {
           id: ev.id || ev.id === 0 ? String(ev.id) : (ev.id || `${Date.now()}-${index}`),
           startDate,
@@ -305,7 +307,7 @@
           title: ev.title || '',
           memo: ev.memo || '',
           users,
-          type: ev.type || 'general',
+          type: ev.type || 'business',
           allDay: !!ev.allDay
         };
       });
@@ -381,8 +383,8 @@
       return `${event.startTime} - ${event.endTime}`;
     }
 
-    function getTypeLabel(type = 'general') {
-      return typeMeta[type]?.label || typeMeta.general.label;
+    function getTypeLabel(type = 'business') {
+      return typeMeta[type]?.label || typeMeta.business.label;
     }
 
     async function loadEvents() {
@@ -613,7 +615,7 @@
           const userColors = ev.users.map(u => userMeta[u]?.color).filter(Boolean);
           bar.style.background = userColors.length > 1
             ? `linear-gradient(90deg, ${userColors.join(', ')})`
-            : (userColors[0] || typeMeta[ev.type]?.color || typeMeta.general.color);
+            : (userColors[0] || typeMeta[ev.type]?.color || typeMeta.business.color);
           const namesLabel = ev.users.length >= Object.keys(userMeta).length
             ? '팀'
             : ev.users.map(u => userMeta[u]?.name).filter(Boolean).join(', ');
@@ -675,7 +677,7 @@
 
       editingEventId = event ? event.id : null;
       selectedUsers = event ? [...event.users] : [];
-      selectedType = event?.type || 'general';
+      selectedType = event?.type || 'business';
       updateUserButtons();
       updateTypeButtons();
 
@@ -717,7 +719,7 @@
       });
       document.getElementById('startTime').disabled = false;
       document.getElementById('endTime').disabled = false;
-      selectedType = 'general';
+      selectedType = 'business';
       updateTypeButtons();
     }
 
