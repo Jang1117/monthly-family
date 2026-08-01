@@ -55,7 +55,7 @@
     .legend-dot { width:10px; height:10px; border-radius:50%; }
     .calendar { position:relative; flex:1; min-height:0; display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); grid-template-rows: min-content repeat(var(--rows, 5), 1fr); gap:8px; overflow:hidden; }
     .calendar.expanded { overflow-x:hidden; overflow-y:auto; grid-template-rows: min-content repeat(var(--rows, 5), minmax(var(--row-min-height, 130px), auto)); }
-    .event-bar { position:absolute; height:26px; border-radius:6px; color:#fff; font-size:0.78rem; font-weight:600; padding:0 10px; display:flex; align-items:center; white-space:nowrap; overflow:hidden; cursor:pointer; box-shadow:none; z-index:5; transition:filter .15s ease, transform .15s ease; }
+    .event-bar { position:absolute; height:22px; border-radius:5px; color:#fff; font-size:0.78rem; font-weight:600; padding:0 8px; display:flex; align-items:center; white-space:nowrap; overflow:hidden; cursor:pointer; box-shadow:none; z-index:5; transition:filter .15s ease, transform .15s ease; }
     .event-bar:hover { filter:brightness(0.96); }
     .event-bar-colorlayer { position:absolute; inset:0; display:flex; z-index:0; }
     .event-bar-color-seg { flex:1; }
@@ -126,7 +126,7 @@
       .day-name { font-size: 0.68rem; padding: 4px 2px 8px; }
       .day-cell { padding: 5px; gap: 2px; }
       .day-number { width: 21px; height: 21px; font-size: 0.78rem; }
-      .event-bar { font-size: 0.72rem; height: 23px; padding: 0 7px 0 6px; }
+      .event-bar { font-size: 0.72rem; }
       .event-row { font-size: 0.72rem; }
       .modal-card { width: min(92vw, 480px); padding: 16px; }
       #addEventBtn { display: none; }
@@ -140,7 +140,7 @@
       button { padding: 8px 12px; font-size: 0.88rem; }
       .day-name { font-size: 0.64rem; }
       .day-number { width: 19px; height: 19px; font-size: 0.72rem; }
-      .event-bar { font-size: 0.66rem; height: 21px; }
+      .event-bar { font-size: 0.66rem; }
       .event-row { font-size: 0.66rem; }
     }
   </style>
