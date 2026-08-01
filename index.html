@@ -55,11 +55,9 @@
     .legend-dot { width:10px; height:10px; border-radius:50%; }
     .calendar { position:relative; flex:1; min-height:0; display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); grid-template-rows: min-content repeat(var(--rows, 5), 1fr); gap:8px; overflow:hidden; }
     .calendar.expanded { overflow-x:hidden; overflow-y:auto; grid-template-rows: min-content repeat(var(--rows, 5), minmax(var(--row-min-height, 130px), auto)); }
-    .event-bar { position:absolute; height:26px; border-radius:6px; border-left:3px solid var(--primary); color: var(--text); font-size:0.78rem; font-weight:600; padding:0 10px 0 9px; display:flex; align-items:center; gap:6px; white-space:nowrap; overflow:hidden; cursor:pointer; box-shadow:none; z-index:5; transition:filter .15s ease, transform .15s ease; }
+    .event-bar { position:absolute; height:26px; border-radius:6px; border-left:3px solid var(--primary); color: var(--text); font-size:0.78rem; font-weight:600; padding:0 10px 0 9px; display:flex; align-items:center; white-space:nowrap; overflow:hidden; cursor:pointer; box-shadow:none; z-index:5; transition:filter .15s ease, transform .15s ease; }
     .event-bar:hover { filter:brightness(0.96); }
-    .event-bar-dots { display:flex; align-items:center; gap:3px; flex-shrink:0; }
-    .event-bar-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
-    .event-bar-label { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .event-bar-label { min-width:0; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .event-bar-label .meta { font-weight:400; color: var(--muted); }
     .day-name { text-align:center; padding:4px 4px 10px; background:transparent; border:none; border-bottom:1px solid var(--line); border-radius:0; font-weight:600; font-size:0.76rem; letter-spacing:0.06em; text-transform:uppercase; color:#8b93a7; }
     .day-name.weekend { color: #e2495c; }
@@ -117,7 +115,7 @@
       .day-name { font-size: 0.68rem; padding: 4px 2px 8px; }
       .day-cell { padding: 5px; gap: 4px; }
       .day-number { width: 21px; height: 21px; font-size: 0.78rem; }
-      .event-bar { font-size: 0.72rem; height: 23px; padding: 0 7px 0 6px; gap: 4px; }
+      .event-bar { font-size: 0.72rem; height: 23px; padding: 0 7px 0 6px; }
       .modal-card { width: min(92vw, 480px); padding: 16px; }
       #addEventBtn { display: none; }
     }
@@ -638,16 +636,6 @@
           const accentColor = userColors[0] || typeMeta[ev.type]?.color || typeMeta.business.color;
           bar.style.background = hexToRgba(accentColor, 0.14);
           bar.style.borderLeftColor = accentColor;
-
-          const dotsWrap = document.createElement('span');
-          dotsWrap.className = 'event-bar-dots';
-          ev.users.forEach(u => {
-            const dot = document.createElement('span');
-            dot.className = 'event-bar-dot';
-            dot.style.background = userMeta[u]?.color || '#94a3b8';
-            dotsWrap.appendChild(dot);
-          });
-          bar.appendChild(dotsWrap);
 
           const namesLabel = ev.users.length >= Object.keys(userMeta).length
             ? '가족'
