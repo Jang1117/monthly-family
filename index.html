@@ -625,6 +625,18 @@
       const bannerTop = Math.round(numberRect.bottom - cellRect.top) + 4;
       calendar.style.setProperty('--row-min-height', `${bannerTop + maxSlots * BANNER_STEP + 14}px`);
 
+      // Mobile (non-expanded): size each week's row to fit only that week's
+      // busiest day, instead of one fixed height for every row. Event bars are
+      // absolutely positioned (out of normal flow), so a plain grid "auto" row
+      // never grows to fit them on its own — without this, a 3rd/4th event on
+      // any day spills visually into the next week's row.
+      if (isMobileView() && !isExpanded) {
+        const rowHeights = rowMaxSlots.map(m => `minmax(${Math.max(88, bannerTop + m * BANNER_STEP + 14)}px, auto)`);
+        calendar.style.gridTemplateRows = `min-content ${rowHeights.join(' ')}`;
+      } else {
+        calendar.style.gridTemplateRows = '';
+      }
+
       document.getElementById('monthLabel').textContent = formatMonthLabel(currentDate);
       renderEventBars(bannerAssignments, cellMap, bannerTop);
       renderTimedEvents(timedAssignments, cellMap, bannerTop);
