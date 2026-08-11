@@ -278,7 +278,7 @@
       birthday: { label: '생일', color: '#ec4899' }
     };
 
-    const API_BASE_URL = 'https://monthly.jang1117.workers.dev/family'; // Cloudflare Worker API
+    const API_BASE_URL = 'https://monthly-family.jang1117.workers.dev'; // Cloudflare Worker API (전용 워커로 분리됨)
 
     const BANNER_TOP = 32; // distance from cell top to the first slot
     const BANNER_STEP = 25; // vertical spacing per slot (shared by banners and timed rows)
@@ -584,7 +584,7 @@
         cell.dataset.date = dateKey;
 
         const dayOfWeek = date.getDay();
-        const isHoliday = events.some(ev => ev.type === 'vacation' && ev.startDate <= dateKey && ev.endDate >= dateKey);
+        const isHoliday = events.some(ev => ev.type === 'vacation' && ev.startDate <= dateKey && ev.endDate >= dateKey && Object.keys(userMeta).every(u => ev.users.includes(u)));
         const number = document.createElement('div');
         number.className = `day-number${(dayOfWeek === 0 || dayOfWeek === 6 || isHoliday) ? ' weekend' : ''}`;
         number.textContent = date.getDate();
