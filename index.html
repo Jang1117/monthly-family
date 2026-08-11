@@ -25,7 +25,7 @@
       font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
       background: linear-gradient(135deg, #dbeafe, #e0e7ff);
       color: var(--text);
-      padding: 16px;
+      padding: 12px;
       height: 100vh;
       overflow: hidden;
     }
@@ -35,7 +35,7 @@
       margin: 0 auto;
       background: rgba(255,255,255,0.95);
       border-radius: 24px;
-      padding: 20px;
+      padding: 14px 20px;
       box-shadow: 0 20px 50px rgba(15, 23, 42, 0.16);
       backdrop-filter: blur(10px);
       height: 100%;
@@ -44,17 +44,16 @@
     }
 
     /* (styles copied from index.html for parity) */
-    header { display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:16px; flex-shrink:0; }
-    h1 { margin:0; font-size:1.85rem; }
-    .controls { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-    button { border:none; border-radius:999px; padding:10px 14px; font-size:0.95rem; cursor:pointer; transition:transform .2s ease, box-shadow .2s ease; }
+    header { display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:10px; flex-shrink:0; }
+    h1 { margin:0; font-size:1.5rem; }
+    .controls { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    button { border:none; border-radius:999px; padding:8px 12px; font-size:0.88rem; cursor:pointer; transition:transform .2s ease, box-shadow .2s ease; }
     .primary-btn { background: var(--primary); color:white; box-shadow: 0 8px 18px rgba(79,70,229,0.2); }
     .secondary-btn { background:#f3f4f6; color:#374151; }
-    .legend { display:flex; gap:10px; flex-wrap:wrap; flex-shrink:0; }
-    .legend-item { display:flex; align-items:center; gap:6px; padding:7px 10px; background:#f8fafc; border:1px solid var(--line); border-radius:999px; font-size:0.92rem; color:#334155; }
-    .legend-dot { width:10px; height:10px; border-radius:50%; }
-    .calendar { position:relative; flex:1; min-height:0; display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); grid-template-rows: min-content repeat(var(--rows, 5), 1fr); gap:8px; overflow:hidden; }
-    .calendar.expanded { overflow-x:hidden; overflow-y:auto; grid-template-rows: min-content repeat(var(--rows, 5), minmax(var(--row-min-height, 130px), auto)); }
+    .legend { display:flex; gap:8px; flex-wrap:wrap; flex-shrink:0; }
+    .legend-item { display:flex; align-items:center; gap:5px; padding:5px 9px; background:#f8fafc; border:1px solid var(--line); border-radius:999px; font-size:0.85rem; color:#334155; }
+    .legend-dot { width:9px; height:9px; border-radius:50%; }
+    .calendar { position:relative; flex:1; min-height:0; display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); grid-template-rows: min-content repeat(var(--rows, 5), 1fr); gap:8px; overflow-x:hidden; overflow-y:auto; }
     .event-bar { position:absolute; height:22px; border-radius:5px; color:#fff; font-size:0.78rem; font-weight:600; padding:0 8px; display:flex; align-items:center; white-space:nowrap; overflow:hidden; cursor:pointer; box-shadow:none; z-index:5; transition:filter .15s ease, transform .15s ease; }
     .event-bar:hover { filter:brightness(0.96); }
     .event-bar-colorlayer { position:absolute; inset:0; display:flex; z-index:0; }
@@ -108,10 +107,10 @@
     .help-list { margin:12px 0 0; padding-left:20px; display:flex; flex-direction:column; gap:10px; color:#374151; font-size:0.92rem; line-height:1.5; }
 
     @media (max-width: 780px) {
-      body { padding: 10px; }
-      .container { padding: 14px; border-radius: 18px; }
-      header { flex-direction: column; align-items: stretch; gap: 10px; margin-bottom: 12px; }
-      h1 { font-size: 1.4rem; text-align: center; }
+      body { padding: 8px; }
+      .container { padding: 10px 14px; border-radius: 18px; }
+      header { flex-direction: column; align-items: stretch; gap: 6px; margin-bottom: 8px; }
+      h1 { font-size: 1.25rem; text-align: center; }
       .legend { justify-content: center; }
       .controls { justify-content: center; flex-wrap: nowrap; gap: 6px; overflow-x: auto; }
       .controls button { padding: 7px 9px; font-size: 0.82rem; }
@@ -163,7 +162,6 @@
           <button class="secondary-btn" onclick="nextMonth()">▶</button>
         </div>
         <button class="secondary-btn" onclick="goToday()">오늘</button>
-        <button class="secondary-btn" id="expandToggleBtn" onclick="toggleExpand()">확장</button>
         <button class="primary-btn" id="addEventBtn" onclick="openModal(formatDateKey(currentDate))">+ 일정 추가</button>
         <button class="secondary-btn" id="helpBtn" onclick="openHelpModal()">❓<span class="btn-label"> 도움말</span></button>
       </div>
@@ -290,17 +288,9 @@
     let editingEventId = null;
     let dragSelection = null;
     let dragEventState = null;
-    let isExpanded = false;
 
     function isMobileView() {
       return window.matchMedia('(max-width: 780px)').matches;
-    }
-
-    function toggleExpand() {
-      isExpanded = !isExpanded;
-      document.getElementById('calendar').classList.toggle('expanded', isExpanded);
-      document.getElementById('expandToggleBtn').textContent = isExpanded ? '축소' : '확장';
-      renderCalendar();
     }
 
     function openHelpModal() {
@@ -556,7 +546,6 @@
         dateKeys.push(formatDateKey(new Date(year, month, i - firstDay + 1)));
       }
       const { bannerAssignments, timedAssignments, rowMaxSlots } = assignSlots(dateKeys);
-      const maxSlots = Math.max(1, ...rowMaxSlots);
 
       const calendar = document.getElementById('calendar');
       calendar.innerHTML = '';
@@ -623,19 +612,14 @@
       const cellRect = sampleCell.getBoundingClientRect();
       const numberRect = sampleNumber.getBoundingClientRect();
       const bannerTop = Math.round(numberRect.bottom - cellRect.top) + 4;
-      calendar.style.setProperty('--row-min-height', `${bannerTop + maxSlots * BANNER_STEP + 14}px`);
 
-      // Mobile (non-expanded): size each week's row to fit only that week's
-      // busiest day, instead of one fixed height for every row. Event bars are
-      // absolutely positioned (out of normal flow), so a plain grid "auto" row
-      // never grows to fit them on its own — without this, a 3rd/4th event on
-      // any day spills visually into the next week's row.
-      if (!isExpanded) {
-        const rowHeights = rowMaxSlots.map(m => `minmax(${Math.max(88, bannerTop + m * BANNER_STEP + 14)}px, auto)`);
-        calendar.style.gridTemplateRows = `min-content ${rowHeights.join(' ')}`;
-      } else {
-        calendar.style.gridTemplateRows = '';
-      }
+      // Size each week's row to fit only that week's busiest day, instead of
+      // one fixed/equal height for every row. Event bars are absolutely
+      // positioned (out of normal flow), so a plain grid "auto" row never
+      // grows to fit them on its own — without this, a busy day's extra
+      // events spill visually into the next week's row.
+      const rowHeights = rowMaxSlots.map(m => `minmax(${Math.max(88, bannerTop + m * BANNER_STEP + 14)}px, auto)`);
+      calendar.style.gridTemplateRows = `min-content ${rowHeights.join(' ')}`;
 
       document.getElementById('monthLabel').textContent = formatMonthLabel(currentDate);
       renderEventBars(bannerAssignments, cellMap, bannerTop);
@@ -1033,7 +1017,8 @@
 
     let wheelCooldown = false;
     document.getElementById('calendar').addEventListener('wheel', (e) => {
-      if (isExpanded) return; // let the expanded view scroll normally
+      const calendarEl = document.getElementById('calendar');
+      if (calendarEl.scrollHeight > calendarEl.clientHeight) return; // let a taller-than-viewport month scroll normally
       if (Math.abs(e.deltaY) < 15) return;
       e.preventDefault();
       if (wheelCooldown) return;
