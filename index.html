@@ -53,7 +53,7 @@
     .legend { display:flex; gap:8px; flex-wrap:wrap; flex-shrink:0; }
     .legend-item { display:flex; align-items:center; gap:5px; padding:5px 9px; background:#f8fafc; border:1px solid var(--line); border-radius:999px; font-size:0.85rem; color:#334155; }
     .legend-dot { width:9px; height:9px; border-radius:50%; }
-    .calendar { position:relative; flex:1; min-height:0; display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); grid-template-rows: min-content repeat(var(--rows, 5), 1fr); gap:8px; overflow-x:hidden; overflow-y:auto; }
+    .calendar { position:relative; flex:1; min-height:0; display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); grid-template-rows: min-content repeat(var(--rows, 5), 1fr); gap:8px; overflow-x:hidden; overflow-y:auto; -webkit-user-select:none; user-select:none; }
     .event-bar { position:absolute; height:22px; border-radius:5px; color:#fff; font-size:0.78rem; font-weight:600; padding:0 8px; display:flex; align-items:center; white-space:nowrap; overflow:hidden; cursor:pointer; box-shadow:none; z-index:5; transition:filter .15s ease, transform .15s ease; }
     .event-bar:hover { filter:brightness(0.96); }
     .event-bar-colorlayer { position:absolute; inset:0; display:flex; z-index:0; }
