@@ -348,6 +348,14 @@
       return formatDateKey(date);
     }
 
+    function daysBetween(fromDateStr, toDateStr) {
+      const [fy, fm, fd] = fromDateStr.split('-').map(Number);
+      const [ty, tm, td] = toDateStr.split('-').map(Number);
+      const from = new Date(fy, fm - 1, fd);
+      const to = new Date(ty, tm - 1, td);
+      return Math.round((to - from) / 86400000);
+    }
+
     function isSameDate(a, b) {
       return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
     }
@@ -684,14 +692,15 @@
         bar.addEventListener('mousedown', (e) => {
           e.stopPropagation();
           e.preventDefault();
-          const allCells = document.querySelectorAll('.day-cell');
-          const sampleCell = allCells[0];
-          const cellWidth = sampleCell ? sampleCell.offsetWidth : 100;
-          let rowHeight = sampleCell ? sampleCell.offsetHeight : 100;
-          if (allCells.length > 7) {
-            rowHeight = allCells[7].getBoundingClientRect().top - allCells[0].getBoundingClientRect().top;
-          }
-          dragEventState = { active: true, eventId: ev.id, originalStart: ev.startDate, originalEnd: ev.endDate, startX: e.clientX, startY: e.clientY, lastDeltaDays: 0, bar, cellWidth, rowHeight };
+          // Rows can now be different heights (auto-sized per week), so drag
+          // distance can't be a fixed pixel-per-row division anymore — track
+          // the bar's real starting position and, on move, find whichever
+          // cell is actually under the cursor instead.
+          const rect = startCell.getBoundingClientRect();
+          dragEventState = {
+            active: true, eventId: ev.id, originalStart: ev.startDate, originalEnd: ev.endDate,
+            originLeft: rect.left, originTop: rect.top, lastDeltaDays: 0, bar
+          };
           bar.classList.add('dragging');
         });
 
@@ -923,14 +932,16 @@
     document.addEventListener('mousemove', (e) => {
       if (!dragEventState || !dragEventState.active) return;
       e.preventDefault();
-      const deltaX = e.clientX - dragEventState.startX;
-      const deltaY = e.clientY - dragEventState.startY;
-      const deltaCols = Math.round(deltaX / dragEventState.cellWidth);
-      const deltaRows = Math.round(deltaY / dragEventState.rowHeight);
-      const deltaDays = deltaCols + deltaRows * 7;
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      const cell = el ? el.closest('.day-cell') : null;
+      if (!cell || !cell.dataset.date) return;
+      const deltaDays = daysBetween(dragEventState.originalStart, cell.dataset.date);
       if (deltaDays === dragEventState.lastDeltaDays) return;
       dragEventState.lastDeltaDays = deltaDays;
-      dragEventState.bar.style.transform = `translate(${deltaCols * dragEventState.cellWidth}px, ${deltaRows * dragEventState.rowHeight}px)`;
+      const rect = cell.getBoundingClientRect();
+      const dx = rect.left - dragEventState.originLeft;
+      const dy = rect.top - dragEventState.originTop;
+      dragEventState.bar.style.transform = `translate(${dx}px, ${dy}px)`;
     });
 
     document.addEventListener('touchmove', (e) => {
